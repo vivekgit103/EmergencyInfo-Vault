@@ -1,0 +1,543 @@
+@import './tokens.css';
+
+/* ==========================================================================
+   EmergencyInfo Vault - Core Styles
+   Atkinson Hyperlegible, WCAG AA Compliant, Layered 3D Tactile Design
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-family);
+  font-size: 16px;
+  background-color: var(--bg-plain-solid);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-plain-solid);
+  color: var(--text-main);
+  overflow-x: hidden;
+}
+
+/* Page with Animated Layered Background (Landing, Login, Register) */
+.page-animated-wrap {
+  position: relative;
+  min-height: 100vh;
+  background: var(--bg-gradient-page);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Content layer sits strictly above the decorative background */
+.content-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Plain background pages (Dashboard, Preview, Public Emergency Card) */
+.page-plain-wrap {
+  background-color: var(--bg-plain-solid);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Accessibility: Skip to Content Link */
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: 12px;
+  background: var(--primary);
+  color: var(--text-inverse);
+  padding: 10px 18px;
+  z-index: 9999;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: var(--btn-radius);
+  transition: top 0.15s ease-in-out;
+}
+
+.skip-link:focus {
+  top: 12px;
+  outline: 3px solid var(--text-main);
+  outline-offset: 3px;
+}
+
+/* Visible Keyboard Focus Rings */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* Layout Containers */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.container-narrow {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-main);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+
+h1 { font-size: var(--font-size-4xl); }
+h2 { font-size: var(--font-size-3xl); }
+h3 { font-size: var(--font-size-2xl); }
+h4 { font-size: var(--font-size-xl); }
+
+p {
+  margin-bottom: 1rem;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+/* Floating Surface Cards */
+.card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--btn-radius);
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Subtle 3D Tilt only for Landing Page Feature Cards */
+.card-tilt {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-tilt:hover {
+  transform: perspective(1000px) rotateX(1.5deg) rotateY(-1.5deg) translateY(-2px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* Forms: Never tilt forms */
+.form-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--btn-radius);
+  padding: 2rem;
+  box-shadow: var(--card-shadow);
+  transform: none !important;
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-label {
+  font-weight: 700;
+  font-size: var(--font-size-base);
+  color: var(--text-main);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  min-height: var(--min-touch-target);
+  padding: 10px 14px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--text-main);
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: var(--btn-radius);
+  transition: border-color 0.15s ease;
+}
+
+.form-textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--primary);
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.form-help {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  min-height: var(--min-touch-target);
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* Sensitive Data Notice Banner */
+.sensitive-notice-banner {
+  background-color: #FFF9EE;
+  border: 1px solid #F2DCAD;
+  border-left: 5px solid #C07000;
+  padding: 1rem 1.25rem;
+  border-radius: var(--btn-radius);
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+  color: #53381B;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.sensitive-notice-banner strong {
+  color: #38240D;
+}
+
+/* Alerts */
+.alert {
+  padding: 1rem;
+  border-radius: var(--btn-radius);
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.alert-danger {
+  background-color: var(--danger-light);
+  color: var(--danger);
+  border-color: #F8B4B4;
+}
+
+.alert-success {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border-color: #A3D4C9;
+}
+
+/* Header & Nav */
+.site-header {
+  background-color: rgba(251, 249, 245, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.875rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.site-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  list-style: none;
+}
+
+.site-nav a {
+  text-decoration: none;
+  color: var(--text-main);
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.site-nav a:hover, .site-nav a.active {
+  color: var(--primary);
+  background-color: var(--primary-light);
+}
+
+@media (max-width: 640px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .site-logo {
+    font-size: 1.125rem;
+  }
+
+  .site-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+
+  .site-nav a {
+    padding: 6px 8px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card, .form-card {
+    padding: 1.25rem 1rem;
+  }
+}
+
+/* Footer */
+.site-footer {
+  margin-top: auto;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  padding: 3rem 0 2rem;
+  font-size: 0.9375rem;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-primary {
+  background-color: var(--priority-primary-bg);
+  color: var(--priority-primary-text);
+}
+
+.badge-secondary {
+  background-color: var(--priority-secondary-bg);
+  color: var(--priority-secondary-text);
+}
+
+.badge-other {
+  background-color: var(--priority-other-bg);
+  color: var(--priority-other-text);
+}
+
+/* Modal Dialog */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(27, 27, 27, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-dialog {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--btn-radius);
+  max-width: 540px;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: var(--card-shadow);
+}
+
+/* Emergency View Specifics */
+.emergency-page {
+  background-color: var(--bg-plain-solid);
+  min-height: 100vh;
+  padding: 1rem 0 3rem;
+}
+
+.emergency-header-bar {
+  background-color: var(--danger);
+  color: var(--text-inverse);
+  padding: 1.25rem 1rem;
+  border-radius: var(--btn-radius) var(--btn-radius) 0 0;
+  text-align: center;
+  border-bottom: 4px solid var(--danger-edge);
+}
+
+.emergency-header-bar h1 {
+  color: var(--text-inverse);
+  font-size: var(--font-size-3xl);
+  margin-bottom: 4px;
+}
+
+.emergency-card-container {
+  background-color: var(--bg-surface);
+  border: 2px solid var(--danger-edge);
+  border-radius: var(--btn-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.emergency-content {
+  padding: 1.5rem;
+}
+
+.emergency-contact-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: var(--btn-radius);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 1px 3px rgba(27, 27, 27, 0.05);
+}
+
+.contact-name {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.contact-rel {
+  font-size: var(--font-size-lg);
+  color: var(--text-muted);
+}
+
+.emergency-instruction-card {
+  border-left: 5px solid var(--primary);
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-left-width: 5px;
+  border-left-color: var(--primary);
+  padding: 1.25rem 1.5rem;
+  border-radius: 0 var(--btn-radius) var(--btn-radius) 0;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(27, 27, 27, 0.05);
+}
+
+.emergency-instruction-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.emergency-instruction-text {
+  font-size: 1.125rem;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transform: none !important;
+  }
+}

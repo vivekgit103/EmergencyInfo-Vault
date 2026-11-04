@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="14" fill="#0F5C4D"/>
+  <!-- Shield outline -->
+  <path d="M32 10 L48 16 V30 C48 42 32 52 32 52 C32 52 16 42 16 30 V16 Z" fill="#FAF8F4"/>
+  <!-- Emergency medical cross inside shield -->
+  <path d="M29 22 H35 V28 H41 V34 H35 V40 H29 V34 H23 V28 H29 Z" fill="#9B1C1C"/>
+</svg>

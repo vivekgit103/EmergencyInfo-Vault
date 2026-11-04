@@ -1,0 +1,75 @@
+/* ==========================================================================
+   Design System Tokens - EmergencyInfo Vault
+   WCAG AA Compliant, Atkinson Hyperlegible, Human-Designed Aesthetic
+   ========================================================================== */
+
+:root {
+  /* Page Base Gradient (Landing, Login, Register) */
+  --bg-gradient-page: linear-gradient(160deg, #EFE8DB 0%, #DDE6DF 100%);
+  --bg-plain-solid: #FAF8F4;
+
+  /* Surfaces (Cards, Forms) */
+  --bg-surface: #FBF9F5;
+  --bg-subtle: #F3EFEA;
+  --bg-card-hover: #F6F3ED;
+
+  /* Text */
+  --text-main: #1B1B1B;
+  --text-muted: #4A4A45;
+  --text-inverse: #FFFFFF;
+
+  /* Borders & Dividers */
+  --border-color: #D9D2C7;
+  --border-subtle: #E8E2D8;
+
+  /* Primary Accent: Deep Teal & Darker Edge */
+  --primary: #0F5C4D;
+  --primary-edge: #0A3F35;
+  --primary-hover: #136E5C;
+  --primary-light: #E4EFEA;
+
+  /* Secondary Button Border & Edge */
+  --secondary-bg: #FBF9F5;
+  --secondary-border: #C8C0B4;
+  --secondary-edge: #A89F92;
+  --secondary-hover: #F2EDE4;
+
+  /* Destructive & Emergency Header: Dark Red & Darker Edge */
+  --danger: #9B1C1C;
+  --danger-edge: #6E1111;
+  --danger-hover: #B02323;
+  --danger-light: #FDE8E8;
+
+  /* Decorative Background Shapes (25% to 45% opacity) */
+  --shape-clay: rgba(201, 162, 126, 0.38);
+  --shape-sage: rgba(169, 191, 177, 0.42);
+  --shape-teal: rgba(15, 92, 77, 0.28);
+  --shape-clay-soft: rgba(201, 162, 126, 0.26);
+  --shape-sage-soft: rgba(169, 191, 177, 0.30);
+
+  /* Shadows (Layered Floating Elevation) */
+  --card-shadow: 0 2px 4px rgba(27, 27, 27, 0.05), 0 12px 28px -4px rgba(27, 27, 27, 0.09);
+  --card-shadow-hover: 0 4px 8px rgba(27, 27, 27, 0.07), 0 18px 36px -4px rgba(27, 27, 27, 0.12);
+  --shadow-sm: 0 1px 3px rgba(27, 27, 27, 0.06);
+
+  /* Button Geometry */
+  --btn-radius: 12px;
+  --min-touch-target: 44px;
+
+  /* Typography */
+  --font-family: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-size-base: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;     /* 18px */
+  --font-size-xl: 1.25rem;      /* 20px */
+  --font-size-2xl: 1.5rem;      /* 24px */
+  --font-size-3xl: 1.875rem;    /* 30px */
+  --font-size-4xl: 2.25rem;     /* 36px */
+
+  /* Priority Badges */
+  --priority-primary-bg: #E4EFEA;
+  --priority-primary-text: #0F5C4D;
+  --priority-secondary-bg: #EFF4FB;
+  --priority-secondary-text: #1E429F;
+  --priority-other-bg: #F0EDE8;
+  --priority-other-text: #4A4A45;
+}

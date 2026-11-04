@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap');
+      .title { font-family: 'Atkinson Hyperlegible', sans-serif; font-weight: 700; font-size: 68px; fill: #1B1B1B; }
+      .tagline { font-family: 'Atkinson Hyperlegible', sans-serif; font-weight: 400; font-size: 34px; fill: #4A4A4A; }
+      .badge-text { font-family: 'Atkinson Hyperlegible', sans-serif; font-weight: 700; font-size: 20px; fill: #FFFFFF; letter-spacing: 1.5px; }
+      .meta { font-family: 'Atkinson Hyperlegible', sans-serif; font-weight: 400; font-size: 24px; fill: #0F5C4D; }
+    </style>
+  </defs>
+
+  <!-- Background Warm Off-White -->
+  <rect width="1200" height="630" fill="#FAF8F4"/>
+
+  <!-- Top Decorative Header Strip in Dark Red -->
+  <rect x="0" y="0" width="1200" height="12" fill="#9B1C1C"/>
+
+  <!-- Inner Border Frame -->
+  <rect x="60" y="60" width="1080" height="510" rx="12" fill="#FFFFFF" stroke="#DDD7CE" stroke-width="2"/>
+
+  <!-- Security Vault Badge -->
+  <g transform="translate(100, 110)">
+    <rect width="210" height="42" rx="6" fill="#0F5C4D"/>
+    <text x="105" y="27" text-anchor="middle" class="badge-text">EMERGENCY VAULT</text>
+  </g>
+
+  <!-- Title -->
+  <text x="100" y="240" class="title">EmergencyInfo Vault</text>
+
+  <!-- Subtitle / Tagline -->
+  <text x="100" y="315" class="tagline">Private emergency contact storage &amp; minimal</text>
+  <text x="100" y="365" class="tagline">read-only cards for first responders.</text>
+
+  <!-- Feature Highlights -->
+  <g transform="translate(100, 440)">
+    <circle cx="10" cy="10" r="6" fill="#0F5C4D"/>
+    <text x="30" y="16" class="meta">Access Controlled</text>
+
+    <circle cx="280" cy="10" r="6" fill="#0F5C4D"/>
+    <text x="300" y="16" class="meta">Zero Sensitive Records Stored</text>
+
+    <circle cx="680" cy="10" r="6" fill="#0F5C4D"/>
+    <text x="700" y="16" class="meta">Time-Expiring Share Links</text>
+  </g>
+</svg>

@@ -1,0 +1,210 @@
+const request = require('supertest');
+const app = require('../app');
+const ShareLink = require('../models/ShareLink');
+
+describe('Public Emergency Card Access & Security', () => {
+  let tokenUser;
+  let normalShareToken;
+  let pinShareToken;
+
+  beforeEach(async () => {
+    // Register owner
+    const res = await request(app).post('/api/auth/register').send({
+      name: 'Dr. John Watson',
+      email: 'watson@example.com',
+      password: 'password123'
+    });
+    tokenUser = res.body.token;
+
+    // Create Emergency Contacts
+    // 1. Secondary visible
+    await request(app)
+      .post('/api/contacts')
+      .set('Authorization', `Bearer ${tokenUser}`)
+      .send({
+        name: 'Mrs. Hudson',
+        relationship: 'Landlady',
+        phone: '+1-555-0188',
+        priority: 'secondary',
+        showInEmergency: true
+      });
+
+    // 2. Primary visible
+    await request(app)
+      .post('/api/contacts')
+      .set('Authorization', `Bearer ${tokenUser}`)
+      .send({
+        name: 'Sherlock Holmes',
+        relationship: 'Partner',
+        phone: '+1-555-0100',
+        priority: 'primary',
+        showInEmergency: true
+      });
+
+    // 3. Other - HIDDEN in emergency
+    await request(app)
+      .post('/api/contacts')
+      .set('Authorization', `Bearer ${tokenUser}`)
+      .send({
+        name: 'Inspector Lestrade',
+        relationship: 'Colleague',
+        phone: '+1-555-0199',
+        priority: 'other',
+        showInEmergency: false
+      });
+
+    // Create Instructions
+    // Visible
+    await request(app)
+      .post('/api/instructions')
+      .set('Authorization', `Bearer ${tokenUser}`)
+      .send({
+        title: 'Penicillin Allergy',
+        text: 'Patient has severe anaphylactic reaction to penicillin.',
+        showInEmergency: true
+      });
+
+    // Hidden in emergency
+    await request(app)
+      .post('/api/instructions')
+      .set('Authorization', `Bearer ${tokenUser}`)
+      .send({
+        title: 'Desk Safe Combination',
+        text: 'The desk safe code is 3829.',
+        showInEmergency: false
+      });
+
+    // Create Normal Share Link
+    const normalLinkRes = await request(app)
+      .post('/api/share-links')
+      .set('Authorization', `Bearer ${tokenUser}`)
+      .send({ expiry: '24h' });
+    normalShareToken = normalLinkRes.body.shareLink.token;
+
+    // Create PIN protected Share Link
+    const pinLinkRes = await request(app)
+      .post('/api/share-links')
+      .set('Authorization', `Bearer ${tokenUser}`)
+      .send({ expiry: '24h', pin: '9876' });
+    pinShareToken = pinLinkRes.body.shareLink.token;
+  });
+
+  test('Nonexistent token returns 404', async () => {
+    const res = await request(app).post('/api/emergency/nonexistent-token-12345');
+    expect(res.status).toBe(404);
+    expect(res.body.message).toMatch(/not exist/i);
+  });
+
+  test('Public access returns minimal payload with only visible items sorted by priority', async () => {
+    const res = await request(app).post(`/api/emergency/${normalShareToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('ownerName', 'Dr. John Watson');
+    expect(res.body).toHaveProperty('contacts');
+    expect(res.body).toHaveProperty('instructions');
+
+    // Security check: NEVER reveal owner email or sensitive user model properties
+    expect(res.body).not.toHaveProperty('email');
+    expect(res.body).not.toHaveProperty('userId');
+    expect(res.body).not.toHaveProperty('password');
+
+    // Only 2 visible contacts returned (Sherlock Holmes & Mrs. Hudson)
+    expect(res.body.contacts.length).toBe(2);
+    // Verified sorted by priority: primary first, secondary next
+    expect(res.body.contacts[0].name).toBe('Sherlock Holmes');
+    expect(res.body.contacts[0].priority).toBe('primary');
+    expect(res.body.contacts[1].name).toBe('Mrs. Hudson');
+    expect(res.body.contacts[1].priority).toBe('secondary');
+
+    // Lestrade (showInEmergency = false) must NOT appear
+    expect(res.body.contacts.some(c => c.name === 'Inspector Lestrade')).toBe(false);
+
+    // Only 1 visible instruction returned (Penicillin Allergy)
+    expect(res.body.instructions.length).toBe(1);
+    expect(res.body.instructions[0].title).toBe('Penicillin Allergy');
+    // Safe combination (showInEmergency = false) must NOT appear
+    expect(res.body.instructions.some(i => i.title === 'Desk Safe Combination')).toBe(false);
+  });
+
+  test('Expired share link returns 410', async () => {
+    // Manually set expiry date to the past
+    await ShareLink.updateOne({ token: normalShareToken }, { expiresAt: new Date(Date.now() - 10000) });
+
+    const res = await request(app).post(`/api/emergency/${normalShareToken}`);
+    expect(res.status).toBe(410);
+    expect(res.body.message).toMatch(/expired/i);
+  });
+
+  test('Revoked share link returns 403', async () => {
+    await ShareLink.updateOne({ token: normalShareToken }, { isRevoked: true });
+
+    const res = await request(app).post(`/api/emergency/${normalShareToken}`);
+    expect(res.status).toBe(403);
+    expect(res.body.message).toMatch(/revoked/i);
+  });
+
+  describe('PIN-protected Emergency Link and Lockout', () => {
+    test('Access without PIN returns 401 with requiresPin: true', async () => {
+      const res = await request(app).post(`/api/emergency/${pinShareToken}`);
+
+      expect(res.status).toBe(401);
+      expect(res.body.requiresPin).toBe(true);
+      expect(res.body.message).toMatch(/protected with a PIN/i);
+    });
+
+    test('Incorrect PIN decrements remaining attempts', async () => {
+      const res = await request(app)
+        .post(`/api/emergency/${pinShareToken}`)
+        .send({ pin: '0000' });
+
+      expect(res.status).toBe(401);
+      expect(res.body.requiresPin).toBe(true);
+      expect(res.body.remainingAttempts).toBe(4);
+    });
+
+    test('5 consecutive incorrect PIN attempts locks the card with 429', async () => {
+      // 4 wrong attempts
+      for (let i = 0; i < 4; i++) {
+        const res = await request(app)
+          .post(`/api/emergency/${pinShareToken}`)
+          .send({ pin: '0000' });
+        expect(res.status).toBe(401);
+      }
+
+      // 5th wrong attempt triggers lockout
+      const lockRes = await request(app)
+        .post(`/api/emergency/${pinShareToken}`)
+        .send({ pin: '0000' });
+
+      expect(lockRes.status).toBe(429);
+      expect(lockRes.body.message).toMatch(/locked/i);
+      expect(lockRes.body).toHaveProperty('lockedUntil');
+
+      // Subsequent attempt even with correct PIN is blocked while locked
+      const blockedRes = await request(app)
+        .post(`/api/emergency/${pinShareToken}`)
+        .send({ pin: '9876' });
+
+      expect(blockedRes.status).toBe(429);
+      expect(blockedRes.body.message).toMatch(/temporarily locked/i);
+    });
+
+    test('Correct PIN returns emergency payload and clears previous failed attempts', async () => {
+      // 1 wrong attempt
+      await request(app).post(`/api/emergency/${pinShareToken}`).send({ pin: '1111' });
+
+      // Correct attempt
+      const res = await request(app)
+        .post(`/api/emergency/${pinShareToken}`)
+        .send({ pin: '9876' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.ownerName).toBe('Dr. John Watson');
+      expect(res.body.contacts.length).toBe(2);
+
+      // Verify attempts reset in DB
+      const dbLink = await ShareLink.findOne({ token: pinShareToken });
+      expect(dbLink.pinAttempts).toBe(0);
+    });
+  });
+});

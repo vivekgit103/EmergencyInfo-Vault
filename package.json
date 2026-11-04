@@ -1,0 +1,28 @@
+{
+  "name": "emergencyinfo-vault",
+  "version": "1.0.0",
+  "description": "EmergencyInfo Vault - Private emergency contact storage and minimal responder card system",
+  "scripts": {
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"green,blue\" \"npm run server:dev\" \"npm run client\"",
+    "start": "node server/server.js",
+    "server": "npm --prefix server start",
+    "server:dev": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "client:build": "npm --prefix client run build",
+    "test": "npm --prefix server test",
+    "seed": "npm --prefix server run seed"
+  },
+  "keywords": [
+    "emergency",
+    "health",
+    "security",
+    "vault",
+    "mern"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "puppeteer": "^25.16.0"
+  }
+}
