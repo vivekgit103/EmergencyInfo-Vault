@@ -1,16 +1,27 @@
 const mongoose = require('mongoose');
+const dns = require('dns');
 
 let memoryServer = null;
 
 const connectDB = async () => {
   const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/emergencyinfo_vault';
 
+  // If using mongodb+srv (e.g. Atlas), set public DNS fallback to prevent ECONNREFUSED on SRV lookup
+  if (uri.startsWith('mongodb+srv://')) {
+    try {
+      dns.setServers(['8.8.8.8', '1.1.1.1']);
+    } catch (dnsErr) {
+      // ignore if DNS setting fails
+    }
+  }
+
   // 1. Attempt connection to configured MongoDB URI
   try {
     const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 2000
+      serverSelectionTimeoutMS: 5000
     });
-    console.log(`[DATABASE] Connected to MongoDB at ${uri}`);
+    const maskedUri = uri.replace(/\/\/([^:]+):([^@]+)@/, '//$1:****@');
+    console.log(`[DATABASE] Connected to MongoDB at ${maskedUri}`);
     return conn;
   } catch (error) {
     if (process.env.NODE_ENV === 'production') {
