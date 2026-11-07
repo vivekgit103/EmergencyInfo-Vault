@@ -4,7 +4,7 @@
   "description": "EmergencyInfo Vault - Private emergency contact storage and minimal responder card system",
   "scripts": {
     "postinstall": "npm --prefix server install && npm --prefix client install",
-    "build": "npm --prefix client run build",
+    "build": "npm --prefix server install && npm --prefix client install && npm --prefix client run build",
     "dev": "concurrently -n \"SERVER,CLIENT\" -c \"green,blue\" \"npm run server:dev\" \"npm run client\"",
     "start": "node server/server.js",
     "server": "npm --prefix server start",
