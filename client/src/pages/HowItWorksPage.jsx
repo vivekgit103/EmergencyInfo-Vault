@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { UserCheck, ShieldAlert, KeyRound, Trash2 } from 'lucide-react';
+import { UserCheck, Shield, KeyRound, Trash2, Clock, Phone } from 'lucide-react';
 import SensitiveDataNotice from '../components/SensitiveDataNotice';
 import Button from '../components/Button';
 
@@ -10,21 +10,28 @@ export default function HowItWorksPage() {
   }, []);
 
   return (
-    <main id="main-content" style={{ padding: '48px 0 64px' }}>
-      <div className="container" style={{ maxWidth: '820px' }}>
-        <h1 style={{ marginBottom: '16px' }}>How EmergencyInfo Vault Works</h1>
-        <p style={{ fontSize: '1.125rem', color: 'var(--text-muted)', marginBottom: '32px' }}>
-          This service provides a clear, access-controlled way to keep emergency contacts ready for responders without publishing your private life to the web.
-        </p>
+    <main id="main-content" className="content-layer" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
+      <div className="container" style={{ maxWidth: '840px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <span className="label-uppercase" style={{ color: 'var(--primary)', display: 'block', marginBottom: '8px' }}>
+            System Architecture
+          </span>
+          <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', marginBottom: '16px' }}>
+            How EmergencyInfo Vault Works
+          </h1>
+          <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: '680px', margin: '0 auto' }}>
+            A clear, access-controlled way to keep emergency contacts ready for responders without publishing your private life to the web.
+          </p>
+        </div>
 
         <SensitiveDataNotice />
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', marginTop: '36px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', marginTop: '36px' }}>
           {/* Step 1 */}
-          <section className="card" aria-labelledby="step-1-title">
+          <section className="form-card" style={{ backgroundColor: 'var(--bg-surface)' }} aria-labelledby="step-1-title">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-              <span className="badge badge-primary" style={{ fontSize: '1rem', padding: '6px 12px' }}>Step 1</span>
-              <h2 id="step-1-title" style={{ fontSize: '1.375rem', margin: 0 }}>Register and Organize Your Contacts</h2>
+              <span className="badge badge-primary">Step 1</span>
+              <h2 id="step-1-title" style={{ fontSize: '1.375rem', margin: 0 }}>Register and Organize Contacts</h2>
             </div>
             <p style={{ color: 'var(--text-muted)' }}>
               Create an account with your name, email, and a secure password (minimum 8 characters). Once logged in, add your emergency contacts: specify their name, relationship (for example Spouse, Parent, or Physician), phone number, and priority rank (Primary, Secondary, or Other).
@@ -35,23 +42,23 @@ export default function HowItWorksPage() {
           </section>
 
           {/* Step 2 */}
-          <section className="card" aria-labelledby="step-2-title">
+          <section className="form-card" style={{ backgroundColor: 'var(--bg-surface)' }} aria-labelledby="step-2-title">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-              <span className="badge badge-primary" style={{ fontSize: '1rem', padding: '6px 12px' }}>Step 2</span>
+              <span className="badge badge-primary">Step 2</span>
               <h2 id="step-2-title" style={{ fontSize: '1.375rem', margin: 0 }}>Record Essential Instructions</h2>
             </div>
             <p style={{ color: 'var(--text-muted)' }}>
               Add short notes intended for a first responder, such as where emergency medicine is located or known drug allergies. Titles are capped at 60 characters and descriptions at 300 characters to keep cards concise and legible under stress.
             </p>
             <p style={{ color: 'var(--text-muted)', margin: 0 }}>
-              <strong>Sensitive Data Guard:</strong> The application automatically scans instruction fields and rejects entries resembling 12-digit national identification numbers or 13 to 19 digit payment card numbers.
+              <strong style={{ color: 'var(--secondary-accent)' }}>Sensitive Data Guard:</strong> The application automatically scans instruction fields and rejects entries resembling 12-digit national identification numbers or 13 to 19 digit payment card numbers.
             </p>
           </section>
 
           {/* Step 3 */}
-          <section className="card" aria-labelledby="step-3-title">
+          <section className="form-card" style={{ backgroundColor: 'var(--bg-surface)' }} aria-labelledby="step-3-title">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-              <span className="badge badge-primary" style={{ fontSize: '1rem', padding: '6px 12px' }}>Step 3</span>
+              <span className="badge badge-primary">Step 3</span>
               <h2 id="step-3-title" style={{ fontSize: '1.375rem', margin: 0 }}>Generate Time-Limited Share Links</h2>
             </div>
             <p style={{ color: 'var(--text-muted)' }}>
@@ -63,23 +70,23 @@ export default function HowItWorksPage() {
           </section>
 
           {/* Step 4 */}
-          <section className="card" aria-labelledby="step-4-title">
+          <section className="form-card" style={{ backgroundColor: 'var(--bg-surface)' }} aria-labelledby="step-4-title">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-              <span className="badge badge-primary" style={{ fontSize: '1rem', padding: '6px 12px' }}>Step 4</span>
+              <span className="badge badge-primary">Step 4</span>
               <h2 id="step-4-title" style={{ fontSize: '1.375rem', margin: 0 }}>The Responder Emergency Card View</h2>
             </div>
             <p style={{ color: 'var(--text-muted)' }}>
-              When a responder opens your link (for example via a printed card or lock screen shortcut), they see a stripped-down, high-contrast page. There are no navigation links, no menus, and no marketing elements.
+              When a responder opens your link (for example via a printed card or lock screen shortcut), they see a stripped-down, high-contrast light page. There are no navigation links, no menus, and no marketing elements.
             </p>
             <p style={{ color: 'var(--text-muted)', margin: 0 }}>
               Contacts are sorted with primary contacts first, accompanied by large tap-to-call buttons. Your personal email address and account records are never revealed on this page.
             </p>
           </section>
 
-          {/* Deletion & Control */}
-          <section className="card" aria-labelledby="step-5-title" style={{ borderColor: 'var(--border-color)' }}>
+          {/* Step 5 */}
+          <section className="form-card" style={{ backgroundColor: 'var(--bg-surface)' }} aria-labelledby="step-5-title">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-              <Trash2 color="#9B1C1C" size={24} aria-hidden="true" />
+              <Trash2 color="var(--danger)" size={24} aria-hidden="true" />
               <h2 id="step-5-title" style={{ fontSize: '1.375rem', margin: 0 }}>Complete Account and Data Deletion</h2>
             </div>
             <p style={{ color: 'var(--text-muted)', margin: 0 }}>
@@ -90,7 +97,7 @@ export default function HowItWorksPage() {
 
         <div style={{ textAlign: 'center', marginTop: '48px' }}>
           <Button to="/register" variant="primary" size="lg">
-            Create Account
+            Create account
           </Button>
         </div>
       </div>

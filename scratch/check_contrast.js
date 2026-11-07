@@ -30,25 +30,39 @@ function getContrast(hex1, hex2) {
 }
 
 const pairs = [
-  { fgName: 'Text main (#1B1B1B)', fg: '#1B1B1B', bgName: 'Card surface (#FBF9F5)', bg: '#FBF9F5', minAA: 4.5 },
-  { fgName: 'Text muted (#4A4A45)', fg: '#4A4A45', bgName: 'Card surface (#FBF9F5)', bg: '#FBF9F5', minAA: 4.5 },
-  { fgName: 'Text main (#1B1B1B)', fg: '#1B1B1B', bgName: 'Solid plain bg (#FAF8F4)', bg: '#FAF8F4', minAA: 4.5 },
-  { fgName: 'Text muted (#4A4A45)', fg: '#4A4A45', bgName: 'Solid plain bg (#FAF8F4)', bg: '#FAF8F4', minAA: 4.5 },
-  { fgName: 'Text main (#1B1B1B)', fg: '#1B1B1B', bgName: 'Page gradient sand (#EFE8DB)', bg: '#EFE8DB', minAA: 4.5 },
-  { fgName: 'Text main (#1B1B1B)', fg: '#1B1B1B', bgName: 'Page gradient sage (#DDE6DF)', bg: '#DDE6DF', minAA: 4.5 },
-  { fgName: 'White (#FFFFFF)', fg: '#FFFFFF', bgName: 'Primary button teal (#0F5C4D)', bg: '#0F5C4D', minAA: 4.5 },
-  { fgName: 'White (#FFFFFF)', fg: '#FFFFFF', bgName: 'Danger button red (#9B1C1C)', bg: '#9B1C1C', minAA: 4.5 },
-  { fgName: 'Text main (#1B1B1B)', fg: '#1B1B1B', bgName: 'Secondary button bg (#F0ECE4)', bg: '#F0ECE4', minAA: 4.5 },
-  { fgName: 'Primary teal (#0F5C4D)', fg: '#0F5C4D', bgName: 'Card surface (#FBF9F5)', bg: '#FBF9F5', minAA: 4.5 },
+  // --- Dark Theme (Marketing and Auth Pages) ---
+  { theme: 'Dark', fgName: 'Text main (#F3EFE6)', fg: '#F3EFE6', bgName: 'Base (#141412)', bg: '#141412', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'Text main (#F3EFE6)', fg: '#F3EFE6', bgName: 'Surface (#1D1D1A)', bg: '#1D1D1A', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'Text main (#F3EFE6)', fg: '#F3EFE6', bgName: 'Raised surface (#252521)', bg: '#252521', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'Text muted (#B9B3A5)', fg: '#B9B3A5', bgName: 'Base (#141412)', bg: '#141412', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'Text muted (#B9B3A5)', fg: '#B9B3A5', bgName: 'Surface (#1D1D1A)', bg: '#1D1D1A', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'Text muted (#B9B3A5)', fg: '#B9B3A5', bgName: 'Raised surface (#252521)', bg: '#252521', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'Clay accent (#D9A66F)', fg: '#D9A66F', bgName: 'Base (#141412)', bg: '#141412', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'Clay accent (#D9A66F)', fg: '#D9A66F', bgName: 'Surface (#1D1D1A)', bg: '#1D1D1A', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'Sage teal (#5FB8A3)', fg: '#5FB8A3', bgName: 'Base (#141412)', bg: '#141412', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'Dark text (#141412)', fg: '#141412', bgName: 'Sage teal button (#5FB8A3)', bg: '#5FB8A3', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'Text main (#F3EFE6)', fg: '#F3EFE6', bgName: 'Secondary button (#252521)', bg: '#252521', minAA: 4.5 },
+  { theme: 'Dark', fgName: 'White (#FFFFFF)', fg: '#FFFFFF', bgName: 'Danger red (#C04545)', bg: '#C04545', minAA: 4.5 },
+
+  // --- Light Theme (Application Pages: Dashboard, Preview, Public Emergency) ---
+  { theme: 'Light', fgName: 'Text main (#1B1B1B)', fg: '#1B1B1B', bgName: 'Base solid (#FAF8F4)', bg: '#FAF8F4', minAA: 4.5 },
+  { theme: 'Light', fgName: 'Text main (#1B1B1B)', fg: '#1B1B1B', bgName: 'Surface card (#FFFFFF)', bg: '#FFFFFF', minAA: 4.5 },
+  { theme: 'Light', fgName: 'Text muted (#4A4A45)', fg: '#4A4A45', bgName: 'Base solid (#FAF8F4)', bg: '#FAF8F4', minAA: 4.5 },
+  { theme: 'Light', fgName: 'Text muted (#4A4A45)', fg: '#4A4A45', bgName: 'Surface card (#FFFFFF)', bg: '#FFFFFF', minAA: 4.5 },
+  { theme: 'Light', fgName: 'White (#FFFFFF)', fg: '#FFFFFF', bgName: 'Primary teal button (#0F5C4D)', bg: '#0F5C4D', minAA: 4.5 },
+  { theme: 'Light', fgName: 'Text main (#1B1B1B)', fg: '#1B1B1B', bgName: 'Secondary button (#FAF8F4)', bg: '#FAF8F4', minAA: 4.5 },
+  { theme: 'Light', fgName: 'White (#FFFFFF)', fg: '#FFFFFF', bgName: 'Danger red (#9B1C1C)', bg: '#9B1C1C', minAA: 4.5 },
+  { theme: 'Light', fgName: 'Primary teal (#0F5C4D)', fg: '#0F5C4D', bgName: 'Base solid (#FAF8F4)', bg: '#FAF8F4', minAA: 4.5 },
+  { theme: 'Light', fgName: 'Danger red (#9B1C1C)', fg: '#9B1C1C', bgName: 'Base solid (#FAF8F4)', bg: '#FAF8F4', minAA: 4.5 },
 ];
 
-console.log('=== WCAG AA CONTRAST RATIO AUDIT ===\n');
+console.log('=== WCAG AA CONTRAST RATIO AUDIT (SYNAPSE REDESIGN) ===\n');
 let allPass = true;
 pairs.forEach(p => {
   const ratio = getContrast(p.fg, p.bg);
   const pass = ratio >= p.minAA;
   if (!pass) allPass = false;
-  console.log(`${pass ? 'PASS' : 'FAIL'} | Ratio: ${ratio.toFixed(2)}:1 (Min: ${p.minAA}:1) | ${p.fgName} on ${p.bgName}`);
+  console.log(`[${p.theme}] ${pass ? 'PASS' : 'FAIL'} | Ratio: ${ratio.toFixed(2)}:1 (Min: ${p.minAA}:1) | ${p.fgName} on ${p.bgName}`);
 });
 
 console.log('\nAudit Result:', allPass ? 'ALL PAIRS PASS WCAG AA' : 'SOME PAIRS FAILED');

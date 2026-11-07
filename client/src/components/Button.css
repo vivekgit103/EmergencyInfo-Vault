@@ -1,6 +1,7 @@
 /* ==========================================================================
-   Shared Button Component Styles
+   Shared Tactile Button Component Styles
    12px radius, 4px solid bottom edge, lift on hover, pressed on active
+   Transitions: 120ms cubic-bezier(0.23, 1, 0.32, 1)
    ========================================================================== */
 
 .app-btn {
@@ -20,93 +21,95 @@
   border: none;
   outline: none;
   position: relative;
-  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+  transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1),
+              box-shadow 120ms cubic-bezier(0.23, 1, 0.32, 1),
+              background-color 120ms cubic-bezier(0.23, 1, 0.32, 1);
   user-select: none;
   max-width: 100%;
   text-align: center;
   word-break: break-word;
 }
 
-/* Primary Variant: Deep Teal with Darker Bottom Edge */
+/* Primary Variant: Sage Teal on dark, Deep Teal on light */
 .app-btn-primary {
   background-color: var(--primary);
-  color: var(--text-inverse);
+  color: var(--primary-text);
   box-shadow: 0 4px 0 var(--primary-edge);
 }
 
-.app-btn-primary:hover:not(:disabled) {
+.app-btn-primary:hover:not(:disabled):not([aria-disabled="true"]) {
   background-color: var(--primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 5px 0 var(--primary-edge);
-  color: var(--text-inverse);
+  color: var(--primary-text);
 }
 
-.app-btn-primary:active:not(:disabled) {
+.app-btn-primary:active:not(:disabled):not([aria-disabled="true"]) {
   transform: translateY(3px);
   box-shadow: 0 1px 0 var(--primary-edge);
-  color: var(--text-inverse);
+  color: var(--primary-text);
 }
 
 .app-btn-primary:focus-visible {
-  outline: 3px solid var(--primary);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
 /* Secondary Variant: Neutral Surface with Edge */
 .app-btn-secondary {
   background-color: var(--secondary-bg);
-  color: var(--text-main);
+  color: var(--secondary-text);
   border: 1px solid var(--secondary-border);
   box-shadow: 0 4px 0 var(--secondary-edge);
 }
 
-.app-btn-secondary:hover:not(:disabled) {
+.app-btn-secondary:hover:not(:disabled):not([aria-disabled="true"]) {
   background-color: var(--secondary-hover);
   transform: translateY(-1px);
   box-shadow: 0 5px 0 var(--secondary-edge);
-  color: var(--text-main);
+  color: var(--secondary-text);
 }
 
-.app-btn-secondary:active:not(:disabled) {
+.app-btn-secondary:active:not(:disabled):not([aria-disabled="true"]) {
   transform: translateY(3px);
   box-shadow: 0 1px 0 var(--secondary-edge);
-  color: var(--text-main);
+  color: var(--secondary-text);
 }
 
 .app-btn-secondary:focus-visible {
-  outline: 3px solid var(--text-main);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
 /* Danger Variant: Dark Red with Darker Edge */
 .app-btn-danger {
   background-color: var(--danger);
-  color: var(--text-inverse);
+  color: var(--danger-text);
   box-shadow: 0 4px 0 var(--danger-edge);
 }
 
-.app-btn-danger:hover:not(:disabled) {
+.app-btn-danger:hover:not(:disabled):not([aria-disabled="true"]) {
   background-color: var(--danger-hover);
   transform: translateY(-1px);
   box-shadow: 0 5px 0 var(--danger-edge);
-  color: var(--text-inverse);
+  color: var(--danger-text);
 }
 
-.app-btn-danger:active:not(:disabled) {
+.app-btn-danger:active:not(:disabled):not([aria-disabled="true"]) {
   transform: translateY(3px);
   box-shadow: 0 1px 0 var(--danger-edge);
-  color: var(--text-inverse);
+  color: var(--danger-text);
 }
 
 .app-btn-danger:focus-visible {
-  outline: 3px solid var(--danger);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
 /* Sizes */
 .app-btn-sm {
-  min-height: 38px;
-  padding: 6px 14px;
+  min-height: 40px;
+  padding: 8px 16px;
   font-size: 0.875rem;
 }
 
@@ -123,10 +126,10 @@
 /* Disabled & Loading States */
 .app-btn:disabled,
 .app-btn[aria-disabled="true"] {
-  opacity: 0.65;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none !important;
-  box-shadow: 0 2px 0 rgba(27, 27, 27, 0.2) !important;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2) !important;
 }
 
 .btn-spinner {
@@ -147,10 +150,20 @@
 @media (prefers-reduced-motion: reduce) {
   .app-btn {
     transition: background-color 0.01ms !important;
-  }
-  .app-btn:hover:not(:disabled),
-  .app-btn:active:not(:disabled) {
     transform: none !important;
+  }
+  .app-btn:hover:not(:disabled):not([aria-disabled="true"]),
+  .app-btn:active:not(:disabled):not([aria-disabled="true"]) {
+    transform: none !important;
+    box-shadow: 0 4px 0 var(--primary-edge) !important;
+  }
+  .app-btn-secondary:hover:not(:disabled):not([aria-disabled="true"]),
+  .app-btn-secondary:active:not(:disabled):not([aria-disabled="true"]) {
+    box-shadow: 0 4px 0 var(--secondary-edge) !important;
+  }
+  .app-btn-danger:hover:not(:disabled):not([aria-disabled="true"]),
+  .app-btn-danger:active:not(:disabled):not([aria-disabled="true"]) {
+    box-shadow: 0 4px 0 var(--danger-edge) !important;
   }
   .btn-spinner {
     animation-duration: 2s !important;

@@ -8,7 +8,7 @@ export default function NotFoundPage() {
   }, []);
 
   return (
-    <main id="main-content" style={{ padding: '64px 0', textAlign: 'center' }}>
+    <main id="main-content" className="content-layer" style={{ paddingTop: '120px', paddingBottom: '80px', textAlign: 'center' }}>
       <div className="container-narrow">
         <div className="card" style={{ padding: '48px 24px' }}>
           <ShieldAlert size={48} color="var(--primary)" style={{ margin: '0 auto 16px' }} />

@@ -347,7 +347,7 @@ export default function DashboardPage() {
                             {contact.priority}
                           </span>
                           {!contact.showInEmergency && (
-                            <span className="badge" style={{ backgroundColor: '#E5E7EB', color: '#4B5563' }}>
+                            <span className="badge badge-other">
                               Hidden from Emergency Card
                             </span>
                           )}
@@ -446,7 +446,7 @@ export default function DashboardPage() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <strong style={{ fontSize: '1.125rem', color: 'var(--primary)' }}>{inst.title}</strong>
                           {!inst.showInEmergency && (
-                            <span className="badge" style={{ backgroundColor: '#E5E7EB', color: '#4B5563' }}>
+                            <span className="badge badge-other">
                               Hidden from Emergency Card
                             </span>
                           )}
@@ -556,15 +556,15 @@ export default function DashboardPage() {
                             <span
                               className="badge"
                               style={{
-                                backgroundColor: isActive ? 'var(--priority-primary-bg)' : '#F3F4F6',
-                                color: isActive ? 'var(--priority-primary-text)' : '#6B7280'
+                                backgroundColor: isActive ? 'var(--badge-primary-bg)' : 'var(--badge-other-bg)',
+                                color: isActive ? 'var(--badge-primary-text)' : 'var(--badge-other-text)'
                               }}
                             >
                               {isRevoked ? 'Revoked' : isExpired ? 'Expired' : 'Active'}
                             </span>
 
                             {link.hasPin && (
-                              <span className="badge" style={{ backgroundColor: '#FEF3C7', color: '#92400E' }}>
+                              <span className="badge badge-secondary">
                                 PIN Protected
                               </span>
                             )}
@@ -631,7 +631,7 @@ export default function DashboardPage() {
 
           {/* Danger Zone: Account Deletion */}
           <div style={{ marginTop: '56px', paddingTop: '32px', borderTop: '2px solid var(--border-color)' }}>
-            <div className="card" style={{ borderColor: 'var(--danger)', backgroundColor: '#FFF5F5' }}>
+            <div className="card" style={{ borderColor: 'var(--danger)', backgroundColor: 'var(--danger-light)' }}>
               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
                 <div>
                   <h3 style={{ color: 'var(--danger)', fontSize: '1.25rem', marginBottom: '4px' }}>

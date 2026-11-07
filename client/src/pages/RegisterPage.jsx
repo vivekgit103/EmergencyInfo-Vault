@@ -77,15 +77,17 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="page-animated-wrap">
+    <div style={{ position: 'relative', minHeight: 'calc(100vh - 80px)' }}>
       <AnimatedBackground />
 
-      <main id="main-content" className="content-layer" style={{ padding: '48px 0 64px' }}>
+      <main id="main-content" className="content-layer" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
         <div className="container-narrow">
           <div className="form-card">
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-              <UserPlus color="#0F5C4D" size={26} aria-hidden="true" />
-              <h1 style={{ fontSize: '1.75rem', margin: 0 }}>Create Your Vault Account</h1>
+              <UserPlus color="var(--primary)" size={26} aria-hidden="true" />
+              <h1 style={{ fontSize: 'clamp(2.25rem, 4.5vw, 2.75rem)', margin: 0 }}>
+                Create Your Vault Account
+              </h1>
             </div>
             <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>
               Set up your private emergency organizer. You control all records and share permissions.
@@ -110,11 +112,15 @@ export default function RegisterPage() {
                   className="form-input"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Alex Taylor"
+                  placeholder="e.g. Alex Mercer"
                   autoComplete="name"
                   required
                 />
-                {errors.name && <span className="form-error">{errors.name}</span>}
+                {errors.name && (
+                  <span className="form-error" role="alert" aria-live="polite">
+                    {errors.name}
+                  </span>
+                )}
               </div>
 
               <div className="form-group">
@@ -131,13 +137,16 @@ export default function RegisterPage() {
                   autoComplete="email"
                   required
                 />
-                <span className="form-help">Your email is kept private and will never be shown on emergency cards.</span>
-                {errors.email && <span className="form-error">{errors.email}</span>}
+                {errors.email && (
+                  <span className="form-error" role="alert" aria-live="polite">
+                    {errors.email}
+                  </span>
+                )}
               </div>
 
               <div className="form-group">
                 <label className="form-label" htmlFor="register-password">
-                  Password (Minimum 8 characters)
+                  Password (8+ characters)
                 </label>
                 <input
                   id="register-password"
@@ -145,11 +154,15 @@ export default function RegisterPage() {
                   className="form-input"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Choose a secure password"
+                  placeholder="Minimum 8 characters"
                   autoComplete="new-password"
                   required
                 />
-                {errors.password && <span className="form-error">{errors.password}</span>}
+                {errors.password && (
+                  <span className="form-error" role="alert" aria-live="polite">
+                    {errors.password}
+                  </span>
+                )}
               </div>
 
               <div className="form-group">
@@ -166,10 +179,14 @@ export default function RegisterPage() {
                   autoComplete="new-password"
                   required
                 />
-                {errors.confirmPassword && <span className="form-error">{errors.confirmPassword}</span>}
+                {errors.confirmPassword && (
+                  <span className="form-error" role="alert" aria-live="polite">
+                    {errors.confirmPassword}
+                  </span>
+                )}
               </div>
 
-              <div style={{ marginTop: '16px' }}>
+              <div style={{ marginTop: '20px' }}>
                 <Button
                   type="submit"
                   variant="primary"
@@ -184,7 +201,7 @@ export default function RegisterPage() {
 
             <div style={{ textAlign: 'center', marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem', margin: 0 }}>
-                Already have an account? <Link to="/login">Log in here</Link>
+                Already have an account? <Link to="/login">Log in</Link>
               </p>
             </div>
           </div>

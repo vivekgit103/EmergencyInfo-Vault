@@ -64,15 +64,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="page-animated-wrap">
+    <div style={{ position: 'relative', minHeight: 'calc(100vh - 80px)' }}>
       <AnimatedBackground />
 
-      <main id="main-content" className="content-layer" style={{ padding: '48px 0 64px' }}>
+      <main id="main-content" className="content-layer" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
         <div className="container-narrow">
           <div className="form-card">
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-              <LogIn color="#0F5C4D" size={26} aria-hidden="true" />
-              <h1 style={{ fontSize: '1.75rem', margin: 0 }}>Log In to Your Vault</h1>
+              <LogIn color="var(--primary)" size={26} aria-hidden="true" />
+              <h1 style={{ fontSize: 'clamp(2.25rem, 4.5vw, 2.75rem)', margin: 0 }}>
+                Log In to Your Vault
+              </h1>
             </div>
             <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>
               Access your private emergency contacts, instructions, and share links.
@@ -99,7 +101,11 @@ export default function LoginPage() {
                   autoComplete="email"
                   required
                 />
-                {errors.email && <span className="form-error">{errors.email}</span>}
+                {errors.email && (
+                  <span className="form-error" role="alert" aria-live="polite">
+                    {errors.email}
+                  </span>
+                )}
               </div>
 
               <div className="form-group">
@@ -116,10 +122,14 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   required
                 />
-                {errors.password && <span className="form-error">{errors.password}</span>}
+                {errors.password && (
+                  <span className="form-error" role="alert" aria-live="polite">
+                    {errors.password}
+                  </span>
+                )}
               </div>
 
-              <div style={{ marginTop: '16px' }}>
+              <div style={{ marginTop: '20px' }}>
                 <Button
                   type="submit"
                   variant="primary"
@@ -134,7 +144,7 @@ export default function LoginPage() {
 
             <div style={{ textAlign: 'center', marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem', margin: 0 }}>
-                Do not have an account? <Link to="/register">Create one now</Link>
+                Do not have an account? <Link to="/register">Create account</Link>
               </p>
             </div>
           </div>

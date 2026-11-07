@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Phone, ArrowLeft, HeartPulse, AlertCircle } from 'lucide-react';
+import { Phone, ArrowLeft, HeartPulse, AlertCircle, Shield } from 'lucide-react';
 import Button from '../components/Button';
 
 const priorityOrder = { primary: 1, secondary: 2, other: 3 };
@@ -31,7 +31,7 @@ export default function EmergencyPreviewPage() {
         setContacts(visibleContacts);
         setInstructions(visibleInstructions);
       } catch (err) {
-        // Failed preview load
+        // Handled silently
       } finally {
         setLoading(false);
       }
@@ -41,9 +41,9 @@ export default function EmergencyPreviewPage() {
   }, []);
 
   return (
-    <div className="emergency-page">
-      {/* Owner Preview Banner */}
-      <div style={{ backgroundColor: '#1E429F', color: '#FFFFFF', padding: '12px 16px', textAlign: 'center', fontWeight: '700', fontSize: '0.9375rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '16px' }}>
+    <div className="emergency-page theme-light">
+      {/* Owner Preview Mode Notice Bar (Deep Teal, solid light theme compliant) */}
+      <div style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-text)', padding: '12px 16px', textAlign: 'center', fontWeight: '700', fontSize: '0.9375rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '16px' }}>
         <span>RESPONDER PREVIEW MODE: This is exactly what a responder will see when opening an active share link.</span>
         <Button to="/dashboard" variant="secondary" size="sm">
           <ArrowLeft size={14} aria-hidden="true" />
@@ -53,32 +53,37 @@ export default function EmergencyPreviewPage() {
 
       <div className="container" style={{ maxWidth: '640px', marginTop: '24px' }}>
         <div className="emergency-card-container">
-          {/* Header in Dark Red */}
+          {/* Header Bar in Dark Red */}
           <header className="emergency-header-bar" role="banner">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '4px' }}>
               <HeartPulse size={28} aria-hidden="true" />
-              <h1 style={{ fontSize: '1.75rem', fontWeight: '700' }}>EMERGENCY INFORMATION</h1>
+              <h1 style={{ fontSize: '1.875rem', fontWeight: '700', letterSpacing: '0.5px' }}>
+                EMERGENCY INFORMATION
+              </h1>
             </div>
-            <p style={{ margin: 0, fontSize: '1.125rem', opacity: 0.95 }}>
-              Card Subject: <strong>{user?.name || 'Cardholder'}</strong>
+            <p style={{ margin: 0, fontSize: '1.25rem', opacity: 0.95, color: '#FFFFFF' }}>
+              Subject: <strong>{user?.name || 'Cardholder'}</strong>
             </p>
           </header>
 
           <main className="emergency-content" id="main-content">
             {loading ? (
-              <p style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>Loading card...</p>
+              <p style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)', fontSize: '1.25rem' }}>
+                Loading preview card...
+              </p>
             ) : (
               <>
                 {/* Emergency Contacts Section */}
                 <section aria-labelledby="contacts-heading" style={{ marginBottom: '32px' }}>
-                  <h2 id="contacts-heading" style={{ fontSize: '1.25rem', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
-                    Emergency Contacts ({contacts.length})
+                  <h2 id="contacts-heading" style={{ fontSize: '1.375rem', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>Emergency Contacts</span>
+                    <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>({contacts.length})</span>
                   </h2>
 
                   {contacts.length === 0 ? (
-                    <div className="card" style={{ textAlign: 'center', backgroundColor: 'var(--bg-subtle)' }}>
+                    <div style={{ padding: '24px', textAlign: 'center', backgroundColor: '#FAF8F4', border: '1px solid var(--border-color)', borderRadius: 'var(--btn-radius)' }}>
                       <AlertCircle size={24} color="var(--text-muted)" style={{ margin: '0 auto 8px' }} />
-                      <p style={{ margin: 0, color: 'var(--text-muted)' }}>
+                      <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '1.125rem' }}>
                         No emergency contacts are currently marked as visible for emergency view.
                       </p>
                     </div>
@@ -102,7 +107,7 @@ export default function EmergencyPreviewPage() {
                             aria-label={`Call ${contact.name} at ${contact.phone}`}
                           >
                             <Phone size={22} aria-hidden="true" />
-                            <span>Call {contact.phone}</span>
+                            <span>Tap to Call {contact.phone}</span>
                           </Button>
                         </div>
                       </article>
@@ -112,13 +117,13 @@ export default function EmergencyPreviewPage() {
 
                 {/* Emergency Instructions Section */}
                 <section aria-labelledby="instructions-heading">
-                  <h2 id="instructions-heading" style={{ fontSize: '1.25rem', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+                  <h2 id="instructions-heading" style={{ fontSize: '1.375rem', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
                     Vital Instructions &amp; Directives ({instructions.length})
                   </h2>
 
                   {instructions.length === 0 ? (
-                    <div className="card" style={{ textAlign: 'center', backgroundColor: 'var(--bg-subtle)' }}>
-                      <p style={{ margin: 0, color: 'var(--text-muted)' }}>
+                    <div style={{ padding: '24px', textAlign: 'center', backgroundColor: '#FAF8F4', border: '1px solid var(--border-color)', borderRadius: 'var(--btn-radius)' }}>
+                      <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '1.125rem' }}>
                         No instructions are marked as visible for emergency view.
                       </p>
                     </div>
@@ -137,8 +142,12 @@ export default function EmergencyPreviewPage() {
             )}
           </main>
 
-          <footer style={{ padding: '16px', textAlign: 'center', borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-subtle)', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-            EmergencyInfo Vault &bull; Minimal Read-Only Emergency Card
+          <footer style={{ padding: '16px', textAlign: 'center', borderTop: '1px solid var(--border-color)', backgroundColor: '#FAF8F4', color: 'var(--text-muted)', fontSize: '0.9375rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '4px' }}>
+              <Shield size={16} color="var(--primary)" aria-hidden="true" />
+              <strong>EmergencyInfo Vault</strong>
+            </div>
+            <span>Minimal Read-Only Emergency View &bull; No sensitive ID or financial data stored</span>
           </footer>
         </div>
       </div>

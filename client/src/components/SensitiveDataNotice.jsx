@@ -4,7 +4,7 @@ import { AlertTriangle } from 'lucide-react';
 export default function SensitiveDataNotice() {
   return (
     <div className="sensitive-notice-banner" role="note" aria-label="Privacy notice regarding sensitive data">
-      <AlertTriangle color="#B45309" size={24} style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden="true" />
+      <AlertTriangle color="var(--secondary-accent)" size={24} style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden="true" />
       <div>
         <strong>Privacy rule:</strong> Do not enter passwords, ID numbers, or financial details.
         <div style={{ marginTop: '4px', fontSize: '0.875rem' }}>

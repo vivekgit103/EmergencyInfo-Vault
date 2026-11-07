@@ -31,7 +31,7 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }) {
       <div className="modal-dialog" style={{ borderColor: 'var(--danger)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <AlertTriangle color="#9B1C1C" size={24} aria-hidden="true" />
+            <AlertTriangle color="var(--danger)" size={24} aria-hidden="true" />
             <h3 id="delete-account-title" style={{ color: 'var(--danger)', margin: 0 }}>Permanently Delete Account</h3>
           </div>
           <button
