@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
+const mongoose = require('mongoose');
 const mongoSanitize = require('./middleware/mongoSanitize');
 const csrfGuard = require('./middleware/csrfGuard');
 
@@ -52,9 +53,19 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 // Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
-// Health check endpoint
+// Health check endpoint reporting DB connection state
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', service: 'EmergencyInfo Vault API' });
+  const isDbConnected = (typeof app.locals.isDbConnected === 'function')
+    ? app.locals.isDbConnected()
+    : mongoose.connection.readyState === 1;
+  const status = isDbConnected ? 'ok' : 'degraded';
+  const statusCode = isDbConnected ? 200 : 503;
+
+  res.status(statusCode).json({
+    status,
+    service: 'EmergencyInfo Vault API',
+    database: isDbConnected ? 'connected' : 'disconnected'
+  });
 });
 
 // Mount API routes

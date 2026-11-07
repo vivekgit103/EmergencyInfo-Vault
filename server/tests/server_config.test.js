@@ -12,4 +12,22 @@ describe('Server Infrastructure Settings', () => {
       .set('Accept-Encoding', 'gzip, deflate');
     expect(res.status).toBe(200);
   });
+
+  describe('/api/health connection reporting', () => {
+    test('Returns 200 with database: connected when mongoose connection is active', async () => {
+      const res = await request(app).get('/api/health');
+      expect(res.status).toBe(200);
+      expect(res.body.status).toBe('ok');
+      expect(res.body.database).toBe('connected');
+    });
+
+    test('Returns 503 with database: disconnected when database is disconnected', async () => {
+      app.locals.isDbConnected = () => false;
+      const res = await request(app).get('/api/health');
+      expect(res.status).toBe(503);
+      expect(res.body.status).toBe('degraded');
+      expect(res.body.database).toBe('disconnected');
+      delete app.locals.isDbConnected;
+    });
+  });
 });
