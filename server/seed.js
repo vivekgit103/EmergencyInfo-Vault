@@ -6,6 +6,10 @@ const Instruction = require('./models/Instruction');
 const ShareLink = require('./models/ShareLink');
 
 const seedDatabase = async () => {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Database seeding is strictly forbidden in production (NODE_ENV=production).');
+  }
+
   try {
     const existingDemoUser = await User.findOne({ email: 'demo@example.com' });
     if (existingDemoUser) {
@@ -89,16 +93,22 @@ const seedDatabase = async () => {
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       isRevoked: false
     });
-    await pinProtectedLink.setPin('4321');
+    await pinProtectedLink.setPin('432100');
     await pinProtectedLink.save();
 
     console.log('[SEED] Demo user & data initialized: demo@example.com / Password123!');
   } catch (err) {
     console.error('[SEED] Failed to seed data:', err.message);
+    throw err;
   }
 };
 
 if (require.main === module) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('[FATAL] Database seeding is strictly forbidden in production environments.');
+    process.exit(1);
+  }
+
   const connectDB = require('./config/db');
   connectDB()
     .then(() => seedDatabase())
@@ -107,7 +117,7 @@ if (require.main === module) {
       process.exit(0);
     })
     .catch((err) => {
-      console.error(err);
+      console.error('[FATAL] Seed operation failed:', err.message);
       process.exit(1);
     });
 }
