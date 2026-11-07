@@ -9,11 +9,18 @@
     "seed": "node seed.js",
     "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit"
   },
-  "keywords": ["emergency", "health", "security", "vault", "mern"],
+  "keywords": [
+    "emergency",
+    "health",
+    "security",
+    "vault",
+    "mern"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "compression": "^1.8.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -34,6 +41,8 @@
   "jest": {
     "testEnvironment": "node",
     "testTimeout": 30000,
-    "setupFilesAfterEnv": ["./tests/setup.js"]
+    "setupFilesAfterEnv": [
+      "./tests/setup.js"
+    ]
   }
 }

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const mongoSanitize = require('./middleware/mongoSanitize');
 const csrfGuard = require('./middleware/csrfGuard');
@@ -14,6 +15,12 @@ const accountRoutes = require('./routes/accountRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
+
+// Trust reverse proxy (e.g. Nginx, Cloudflare, load balancers)
+app.set('trust proxy', 1);
+
+// HTTP response compression
+app.use(compression());
 
 // Secure HTTP Headers
 app.use(helmet());
