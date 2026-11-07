@@ -25,6 +25,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     const res = await request(app)
       .post('/api/instructions')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         title: 'Asthma Inhaler',
         text: 'Inhaler is in the left bag pocket. Take 2 puffs in emergency.',
@@ -36,7 +37,8 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
 
     const listRes = await request(app)
       .get('/api/instructions')
-      .set('Cookie', cookieUserA);
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(listRes.status).toBe(200);
     expect(listRes.body.instructions.length).toBe(1);
@@ -49,6 +51,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     const resTitle = await request(app)
       .post('/api/instructions')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         title: longTitle,
         text: 'Normal text'
@@ -59,6 +62,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     const resText = await request(app)
       .post('/api/instructions')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         title: 'Normal Title',
         text: longText
@@ -72,6 +76,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
       const res = await request(app)
         .post('/api/instructions')
         .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
         .send({
           title: 'My ID info',
           text: 'My government ID number is 1234 5678 9012 please check'
@@ -85,6 +90,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
       const res = await request(app)
         .post('/api/instructions')
         .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
         .send({
           title: 'ID Number',
           text: 'National ID: 987654321098'
@@ -98,6 +104,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
       const res = await request(app)
         .post('/api/instructions')
         .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
         .send({
           title: 'Emergency card for expenses',
           text: 'Card details: 4111 2222 3333 4444'
@@ -111,6 +118,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
       const res = await request(app)
         .post('/api/instructions')
         .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
         .send({
           title: 'Card 1234567890123456',
           text: 'Call bank'
@@ -124,6 +132,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
       const res = await request(app)
         .post('/api/instructions')
         .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
         .send({
           title: 'Medication Schedule',
           text: 'Take 2 pills of 500mg Metformin at 8:00 AM. Apartment number is 402B.'
@@ -137,6 +146,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     const createRes = await request(app)
       .post('/api/instructions')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         title: 'Secret Info',
         text: 'Only for User A'
@@ -148,6 +158,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     const updateRes = await request(app)
       .put(`/api/instructions/${instId}`)
       .set('Cookie', cookieUserB)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ title: 'Tampered' });
 
     expect(updateRes.status).toBe(404);
@@ -155,7 +166,8 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     // User B tries to delete
     const deleteRes = await request(app)
       .delete(`/api/instructions/${instId}`)
-      .set('Cookie', cookieUserB);
+      .set('Cookie', cookieUserB)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(deleteRes.status).toBe(404);
   });

@@ -21,6 +21,7 @@ describe('Public Emergency Card Access & Security', () => {
     await request(app)
       .post('/api/contacts')
       .set('Cookie', cookieUser)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Mrs. Hudson',
         relationship: 'Landlady',
@@ -33,6 +34,7 @@ describe('Public Emergency Card Access & Security', () => {
     await request(app)
       .post('/api/contacts')
       .set('Cookie', cookieUser)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Sherlock Holmes',
         relationship: 'Partner',
@@ -45,6 +47,7 @@ describe('Public Emergency Card Access & Security', () => {
     await request(app)
       .post('/api/contacts')
       .set('Cookie', cookieUser)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Inspector Lestrade',
         relationship: 'Colleague',
@@ -58,6 +61,7 @@ describe('Public Emergency Card Access & Security', () => {
     await request(app)
       .post('/api/instructions')
       .set('Cookie', cookieUser)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         title: 'Penicillin Allergy',
         text: 'Patient has severe anaphylactic reaction to penicillin.',
@@ -68,6 +72,7 @@ describe('Public Emergency Card Access & Security', () => {
     await request(app)
       .post('/api/instructions')
       .set('Cookie', cookieUser)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         title: 'Desk Safe Combination',
         text: 'The desk safe code is 3829.',
@@ -78,6 +83,7 @@ describe('Public Emergency Card Access & Security', () => {
     const normalLinkRes = await request(app)
       .post('/api/share-links')
       .set('Cookie', cookieUser)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '24h' });
     normalShareToken = normalLinkRes.body.shareLink.token;
 
@@ -85,6 +91,7 @@ describe('Public Emergency Card Access & Security', () => {
     const pinLinkRes = await request(app)
       .post('/api/share-links')
       .set('Cookie', cookieUser)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '24h', pin: '9876' });
     pinShareToken = pinLinkRes.body.shareLink.token;
   });

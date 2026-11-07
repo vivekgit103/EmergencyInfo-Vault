@@ -33,6 +33,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     await request(app)
       .post('/api/contacts')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Dr. Smith',
         relationship: 'Doctor',
@@ -45,6 +46,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     await request(app)
       .post('/api/contacts')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Jane Spouse',
         relationship: 'Spouse',
@@ -55,7 +57,8 @@ describe('Emergency Contacts CRUD & Isolation', () => {
 
     const res = await request(app)
       .get('/api/contacts')
-      .set('Cookie', cookieUserA);
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(res.status).toBe(200);
     expect(res.body.contacts.length).toBe(2);
@@ -68,6 +71,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     const res = await request(app)
       .post('/api/contacts')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Invalid Contact',
         relationship: 'Friend',
@@ -82,6 +86,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     const createRes = await request(app)
       .post('/api/contacts')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Original Name',
         relationship: 'Friend',
@@ -94,6 +99,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     const updateRes = await request(app)
       .put(`/api/contacts/${contactId}`)
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Updated Name',
         relationship: 'Best Friend',
@@ -106,14 +112,16 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     // Delete
     const deleteRes = await request(app)
       .delete(`/api/contacts/${contactId}`)
-      .set('Cookie', cookieUserA);
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(deleteRes.status).toBe(200);
 
     // Verify gone
     const listRes = await request(app)
       .get('/api/contacts')
-      .set('Cookie', cookieUserA);
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(listRes.body.contacts.length).toBe(0);
   });
@@ -123,6 +131,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     const createRes = await request(app)
       .post('/api/contacts')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'User A Secret Contact',
         relationship: 'Confidant',
@@ -134,7 +143,8 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     // User B lists contacts - should be empty
     const listB = await request(app)
       .get('/api/contacts')
-      .set('Cookie', cookieUserB);
+      .set('Cookie', cookieUserB)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(listB.body.contacts.length).toBe(0);
 
@@ -142,6 +152,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     const updateB = await request(app)
       .put(`/api/contacts/${contactId}`)
       .set('Cookie', cookieUserB)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ name: 'Hacked by B' });
 
     expect(updateB.status).toBe(404);
@@ -149,14 +160,16 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     // User B tries to delete User A contact - should return 404
     const deleteB = await request(app)
       .delete(`/api/contacts/${contactId}`)
-      .set('Cookie', cookieUserB);
+      .set('Cookie', cookieUserB)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(deleteB.status).toBe(404);
 
     // Contact still exists under User A
     const listA = await request(app)
       .get('/api/contacts')
-      .set('Cookie', cookieUserA);
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(listA.body.contacts.length).toBe(1);
     expect(listA.body.contacts[0].name).toBe('User A Secret Contact');

@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const mongoSanitize = require('./middleware/mongoSanitize');
+const csrfGuard = require('./middleware/csrfGuard');
 
 const authRoutes = require('./routes/authRoutes');
 const contactRoutes = require('./routes/contactRoutes');
@@ -31,7 +32,7 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type']
+    allowedHeaders: ['Content-Type', 'X-Requested-With']
   })
 );
 
@@ -50,11 +51,11 @@ app.get('/api/health', (req, res) => {
 
 // Mount API routes
 app.use('/api/auth', authRoutes);
-app.use('/api/contacts', contactRoutes);
-app.use('/api/instructions', instructionRoutes);
-app.use('/api/share-links', shareLinkRoutes);
+app.use('/api/contacts', csrfGuard, contactRoutes);
+app.use('/api/instructions', csrfGuard, instructionRoutes);
+app.use('/api/share-links', csrfGuard, shareLinkRoutes);
 app.use('/api/emergency', emergencyRoutes);
-app.use('/api/account', accountRoutes);
+app.use('/api/account', csrfGuard, accountRoutes);
 
 // Catch-all for undefined routes
 app.use('*', (req, res) => {

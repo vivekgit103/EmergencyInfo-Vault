@@ -23,6 +23,7 @@ describe('Account Deletion & Data Cascade', () => {
     await request(app)
       .post('/api/contacts')
       .set('Cookie', authCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Contact to delete',
         relationship: 'Friend',
@@ -33,6 +34,7 @@ describe('Account Deletion & Data Cascade', () => {
     await request(app)
       .post('/api/instructions')
       .set('Cookie', authCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         title: 'Instruction to delete',
         text: 'This should be wiped out completely.'
@@ -42,6 +44,7 @@ describe('Account Deletion & Data Cascade', () => {
     await request(app)
       .post('/api/share-links')
       .set('Cookie', authCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '24h' });
   });
 
@@ -49,6 +52,7 @@ describe('Account Deletion & Data Cascade', () => {
     const res = await request(app)
       .delete('/api/account')
       .set('Cookie', authCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({});
 
     expect(res.status).toBe(400);
@@ -59,6 +63,7 @@ describe('Account Deletion & Data Cascade', () => {
     const res = await request(app)
       .delete('/api/account')
       .set('Cookie', authCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ password: 'wrongpassword' });
 
     expect(res.status).toBe(401);
@@ -76,6 +81,7 @@ describe('Account Deletion & Data Cascade', () => {
     const res = await request(app)
       .delete('/api/account')
       .set('Cookie', authCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ password: 'password123' });
 
     expect(res.status).toBe(200);

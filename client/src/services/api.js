@@ -8,6 +8,7 @@ const API_BASE = '/api';
 const request = async (endpoint, options = {}) => {
   const headers = {
     'Content-Type': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
     ...(options.headers || {})
   };
 

@@ -36,6 +36,7 @@ describe('Full End-to-End User Flow', () => {
     const contact1Res = await request(app)
       .post('/api/contacts')
       .set('Cookie', sessionCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Morgan Rivera',
         relationship: 'Spouse',
@@ -50,6 +51,7 @@ describe('Full End-to-End User Flow', () => {
     const contact2Res = await request(app)
       .post('/api/contacts')
       .set('Cookie', sessionCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         name: 'Dr. Evelyn Reed',
         relationship: 'Cardiologist',
@@ -63,6 +65,7 @@ describe('Full End-to-End User Flow', () => {
     const instRes = await request(app)
       .post('/api/instructions')
       .set('Cookie', sessionCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         title: 'Heart Medication',
         text: 'Takes 10mg Lisinopril daily. Water bottle in gym bag.',
@@ -75,6 +78,7 @@ describe('Full End-to-End User Flow', () => {
     const sensitiveRes = await request(app)
       .post('/api/instructions')
       .set('Cookie', sessionCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({
         title: 'Forbidden ID',
         text: 'My ID is 9876 5432 1098'
@@ -86,6 +90,7 @@ describe('Full End-to-End User Flow', () => {
     const toggleRes = await request(app)
       .put(`/api/contacts/${contact1Id}`)
       .set('Cookie', sessionCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ showInEmergency: false });
     expect(toggleRes.status).toBe(200);
     expect(toggleRes.body.contact.showInEmergency).toBe(false);
@@ -94,12 +99,14 @@ describe('Full End-to-End User Flow', () => {
     await request(app)
       .put(`/api/contacts/${contact1Id}`)
       .set('Cookie', sessionCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ showInEmergency: true });
 
     // 7. Generate Share Link with 24h expiry
     const linkRes = await request(app)
       .post('/api/share-links')
       .set('Cookie', sessionCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '24h' });
     expect(linkRes.status).toBe(201);
     const publicToken = linkRes.body.shareLink.token;
@@ -120,7 +127,8 @@ describe('Full End-to-End User Flow', () => {
     // 9. Revoke share link
     const revokeRes = await request(app)
       .delete(`/api/share-links/${linkId}`)
-      .set('Cookie', sessionCookie);
+      .set('Cookie', sessionCookie)
+      .set('X-Requested-With', 'XMLHttpRequest');
     expect(revokeRes.status).toBe(200);
 
     // Try opening revoked link logged-out
@@ -134,6 +142,7 @@ describe('Full End-to-End User Flow', () => {
     const pinLinkRes = await request(app)
       .post('/api/share-links')
       .set('Cookie', sessionCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '7d', pin: '8899' });
     const pinToken = pinLinkRes.body.shareLink.token;
 
@@ -156,6 +165,7 @@ describe('Full End-to-End User Flow', () => {
     const deleteAccRes = await request(app)
       .delete('/api/account')
       .set('Cookie', sessionCookie)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ password: 'SecurePassword123!' });
     expect(deleteAccRes.status).toBe(200);
 

@@ -26,6 +26,7 @@ describe('Share Links Management', () => {
     const res = await request(app)
       .post('/api/share-links')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '24h' });
 
     expect(res.status).toBe(201);
@@ -46,6 +47,7 @@ describe('Share Links Management', () => {
     const res = await request(app)
       .post('/api/share-links')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '1h', pin: '5678' });
 
     expect(res.status).toBe(201);
@@ -66,16 +68,19 @@ describe('Share Links Management', () => {
     await request(app)
       .post('/api/share-links')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '1h' });
 
     await request(app)
       .post('/api/share-links')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '7d' });
 
     const res = await request(app)
       .get('/api/share-links')
-      .set('Cookie', cookieUserA);
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(res.status).toBe(200);
     expect(res.body.shareLinks.length).toBe(2);
@@ -85,13 +90,15 @@ describe('Share Links Management', () => {
     const createRes = await request(app)
       .post('/api/share-links')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '24h' });
 
     const linkId = createRes.body.shareLink._id;
 
     const revokeRes = await request(app)
       .delete(`/api/share-links/${linkId}`)
-      .set('Cookie', cookieUserA);
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(revokeRes.status).toBe(200);
     expect(revokeRes.body.shareLink.isRevoked).toBe(true);
@@ -104,13 +111,15 @@ describe('Share Links Management', () => {
     const createRes = await request(app)
       .post('/api/share-links')
       .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
       .send({ expiry: '24h' });
 
     const linkId = createRes.body.shareLink._id;
 
     const revokeRes = await request(app)
       .delete(`/api/share-links/${linkId}`)
-      .set('Cookie', cookieUserB);
+      .set('Cookie', cookieUserB)
+      .set('X-Requested-With', 'XMLHttpRequest');
 
     expect(revokeRes.status).toBe(404);
   });
