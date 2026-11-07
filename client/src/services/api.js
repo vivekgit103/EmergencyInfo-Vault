@@ -3,7 +3,9 @@
  * Cookie-only authentication via httpOnly cookies
  */
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
+  : '/api';
 
 const request = async (endpoint, options = {}) => {
   const headers = {

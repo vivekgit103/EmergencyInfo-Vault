@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -63,6 +64,19 @@ app.use('/api/instructions', csrfGuard, instructionRoutes);
 app.use('/api/share-links', csrfGuard, shareLinkRoutes);
 app.use('/api/emergency', emergencyRoutes);
 app.use('/api/account', csrfGuard, accountRoutes);
+
+// Single-service production mode: serve built client assets with React Router fallback for non-/api routes
+if (process.env.NODE_ENV === 'production') {
+  const clientDist = path.join(__dirname, '../client/dist');
+  app.use(express.static(clientDist));
+
+  app.get('*', (req, res, next) => {
+    if (req.originalUrl.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+}
 
 // Catch-all for undefined routes
 app.use('*', (req, res) => {
