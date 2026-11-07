@@ -30,6 +30,18 @@ const getShareLinks = asyncHandler(async (req, res) => {
 const createShareLink = asyncHandler(async (req, res) => {
   const { expiry = '24h', pin } = req.body;
 
+  // Trim and validate PIN in controller as defense-in-depth:
+  // Rejects invalid PINs with 400 so a link can never silently be created without the PIN the owner typed.
+  let trimmedPin = null;
+  if (Object.prototype.hasOwnProperty.call(req.body, 'pin') && pin !== null && pin !== undefined) {
+    trimmedPin = String(pin).trim();
+    if (!/^\d{6,}$/.test(trimmedPin)) {
+      return res.status(400).json({
+        message: 'Invalid PIN: PIN must be at least 6 numeric digits'
+      });
+    }
+  }
+
   const durationMs = durationMap[expiry] || durationMap['24h'];
   const expiresAt = new Date(Date.now() + durationMs);
 
@@ -43,8 +55,8 @@ const createShareLink = asyncHandler(async (req, res) => {
     isRevoked: false
   });
 
-  if (pin && typeof pin === 'string' && pin.trim().length > 0) {
-    await shareLink.setPin(pin.trim());
+  if (trimmedPin) {
+    await shareLink.setPin(trimmedPin);
   }
 
   await shareLink.save();

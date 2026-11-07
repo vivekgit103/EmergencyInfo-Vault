@@ -91,7 +91,7 @@ export default function EmergencyCardPage() {
   const handlePinSubmit = async (e) => {
     e.preventDefault();
     if (!pin.trim()) {
-      setPinError('Please enter the 4 to 8 digit PIN');
+      setPinError('Please enter the minimum 6 digit PIN');
       return;
     }
 
@@ -205,8 +205,8 @@ export default function EmergencyCardPage() {
                 style={{ fontSize: '1.5rem', letterSpacing: '4px', textAlign: 'center', height: '54px' }}
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                placeholder="••••"
-                maxLength={8}
+                placeholder="••••••"
+                maxLength={12}
                 autoFocus
                 required
               />

@@ -48,7 +48,7 @@ describe('Share Links Management', () => {
       .post('/api/share-links')
       .set('Cookie', cookieUserA)
       .set('X-Requested-With', 'XMLHttpRequest')
-      .send({ expiry: '1h', pin: '5678' });
+      .send({ expiry: '1h', pin: '567890' });
 
     expect(res.status).toBe(201);
     expect(res.body.shareLink).toHaveProperty('token');
@@ -59,9 +59,48 @@ describe('Share Links Management', () => {
     // Check DB directly: PIN must be hashed, never plain text
     const dbLink = await ShareLink.findOne({ token: res.body.shareLink.token });
     expect(dbLink.pinHash).toBeDefined();
-    expect(dbLink.pinHash).not.toBe('5678');
-    expect(await dbLink.matchPin('5678')).toBe(true);
-    expect(await dbLink.matchPin('0000')).toBe(false);
+    expect(dbLink.pinHash).not.toBe('567890');
+    expect(await dbLink.matchPin('567890')).toBe(true);
+    expect(await dbLink.matchPin('000000')).toBe(false);
+  });
+
+  test('Rejects invalid PINs with 400 so a link cannot silently be created unpinned', async () => {
+    // Fewer than 6 digits
+    const resShort = await request(app)
+      .post('/api/share-links')
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({ expiry: '1h', pin: '12345' });
+    expect(resShort.status).toBe(400);
+
+    // Non-numeric
+    const resAlpha = await request(app)
+      .post('/api/share-links')
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({ expiry: '1h', pin: 'abcdef' });
+    expect(resAlpha.status).toBe(400);
+
+    // Whitespace only
+    const resSpaces = await request(app)
+      .post('/api/share-links')
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({ expiry: '1h', pin: '      ' });
+    expect(resSpaces.status).toBe(400);
+  });
+
+  test('Trims PIN whitespace and sets properly', async () => {
+    const res = await request(app)
+      .post('/api/share-links')
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({ expiry: '1h', pin: '  654321  ' });
+
+    expect(res.status).toBe(201);
+    expect(res.body.shareLink.hasPin).toBe(true);
+    const dbLink = await ShareLink.findOne({ token: res.body.shareLink.token });
+    expect(await dbLink.matchPin('654321')).toBe(true);
   });
 
   test('Lists all share links for authenticated owner', async () => {

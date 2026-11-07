@@ -12,8 +12,8 @@ export default function ShareLinkModal({ isOpen, onClose, onGenerate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (pin.trim() && (pin.trim().length < 4 || pin.trim().length > 8)) {
-      setError('If set, PIN must be between 4 and 8 characters');
+    if (pin.trim() && (!/^\d{6,}$/.test(pin.trim()))) {
+      setError('If set, PIN must be at least 6 numeric digits');
       return;
     }
 
@@ -80,7 +80,7 @@ export default function ShareLinkModal({ isOpen, onClose, onGenerate }) {
           <div className="form-group">
             <label className="form-label" htmlFor="link-pin">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <Key size={16} aria-hidden="true" /> Optional Security PIN (4 to 8 characters)
+                <Key size={16} aria-hidden="true" /> Optional Security PIN (minimum 6 digits)
               </span>
             </label>
             <input
@@ -90,8 +90,8 @@ export default function ShareLinkModal({ isOpen, onClose, onGenerate }) {
               className="form-input"
               value={pin}
               onChange={(e) => setPin(e.target.value)}
-              placeholder="Leave empty for direct access, or enter e.g. 4321"
-              maxLength={8}
+              placeholder="Leave empty for direct access, or enter e.g. 123456"
+              maxLength={12}
             />
             <span className="form-help">
               If provided, any responder opening the link must enter this PIN. The PIN is stored hashed and cannot be viewed by our system.

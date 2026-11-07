@@ -92,7 +92,7 @@ describe('Public Emergency Card Access & Security', () => {
       .post('/api/share-links')
       .set('Cookie', cookieUser)
       .set('X-Requested-With', 'XMLHttpRequest')
-      .send({ expiry: '24h', pin: '9876' });
+      .send({ expiry: '24h', pin: '987654' });
     pinShareToken = pinLinkRes.body.shareLink.token;
   });
 
@@ -183,7 +183,7 @@ describe('Public Emergency Card Access & Security', () => {
     test('Incorrect PIN decrements remaining attempts', async () => {
       const res = await request(app)
         .post(`/api/emergency/${pinShareToken}`)
-        .send({ pin: '0000' });
+        .send({ pin: '000000' });
 
       expect(res.status).toBe(401);
       expect(res.body.requiresPin).toBe(true);
@@ -195,14 +195,14 @@ describe('Public Emergency Card Access & Security', () => {
       for (let i = 0; i < 4; i++) {
         const res = await request(app)
           .post(`/api/emergency/${pinShareToken}`)
-          .send({ pin: '0000' });
+          .send({ pin: '000000' });
         expect(res.status).toBe(401);
       }
 
       // 5th wrong attempt triggers lockout
       const lockRes = await request(app)
         .post(`/api/emergency/${pinShareToken}`)
-        .send({ pin: '0000' });
+        .send({ pin: '000000' });
 
       expect(lockRes.status).toBe(429);
       expect(lockRes.body.message).toMatch(/locked/i);
@@ -211,7 +211,7 @@ describe('Public Emergency Card Access & Security', () => {
       // Subsequent attempt even with correct PIN is blocked while locked
       const blockedRes = await request(app)
         .post(`/api/emergency/${pinShareToken}`)
-        .send({ pin: '9876' });
+        .send({ pin: '987654' });
 
       expect(blockedRes.status).toBe(429);
       expect(blockedRes.body.message).toMatch(/temporarily locked/i);
@@ -219,12 +219,12 @@ describe('Public Emergency Card Access & Security', () => {
 
     test('Correct PIN returns emergency payload and clears previous failed attempts', async () => {
       // 1 wrong attempt
-      await request(app).post(`/api/emergency/${pinShareToken}`).send({ pin: '1111' });
+      await request(app).post(`/api/emergency/${pinShareToken}`).send({ pin: '111111' });
 
       // Correct attempt
       const res = await request(app)
         .post(`/api/emergency/${pinShareToken}`)
-        .send({ pin: '9876' });
+        .send({ pin: '987654' });
 
       expect(res.status).toBe(200);
       expect(res.body.ownerName).toBe('Dr. John Watson');

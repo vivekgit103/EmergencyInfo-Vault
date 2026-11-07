@@ -16,9 +16,17 @@ const shareLinkValidation = [
     .isIn(['1h', '24h', '7d'])
     .withMessage('Expiry must be 1h, 24h, or 7d'),
   body('pin')
-    .optional({ checkFalsy: true })
-    .isLength({ min: 4, max: 8 })
-    .withMessage('Optional PIN must be between 4 and 8 characters')
+    .optional({ nullable: true })
+    .custom((val) => {
+      if (val === undefined || val === null) {
+        return true;
+      }
+      const trimmed = String(val).trim();
+      if (!/^\d{6,}$/.test(trimmed)) {
+        throw new Error('PIN must be at least 6 numeric digits');
+      }
+      return true;
+    })
 ];
 
 // All share-link management routes are protected

@@ -138,12 +138,12 @@ describe('Full End-to-End User Flow', () => {
     expect(revokedViewRes.status).toBe(403);
     expect(revokedViewRes.body.message).toMatch(/revoked/i);
 
-    // 10. Generate link with PIN
+    // 10. Generate link with PIN (min 6 digits)
     const pinLinkRes = await request(app)
       .post('/api/share-links')
       .set('Cookie', sessionCookie)
       .set('X-Requested-With', 'XMLHttpRequest')
-      .send({ expiry: '7d', pin: '8899' });
+      .send({ expiry: '7d', pin: '889900' });
     const pinToken = pinLinkRes.body.shareLink.token;
 
     // Access without PIN -> 401
@@ -152,12 +152,12 @@ describe('Full End-to-End User Flow', () => {
     expect(noPinRes.body.requiresPin).toBe(true);
 
     // Access with wrong PIN -> 401
-    const wrongPinRes = await request(app).post(`/api/emergency/${pinToken}`).send({ pin: '0000' });
+    const wrongPinRes = await request(app).post(`/api/emergency/${pinToken}`).send({ pin: '000000' });
     expect(wrongPinRes.status).toBe(401);
     expect(wrongPinRes.body.remainingAttempts).toBe(4);
 
     // Access with correct PIN -> 200
-    const correctPinRes = await request(app).post(`/api/emergency/${pinToken}`).send({ pin: '8899' });
+    const correctPinRes = await request(app).post(`/api/emergency/${pinToken}`).send({ pin: '889900' });
     expect(correctPinRes.status).toBe(200);
     expect(correctPinRes.body.ownerName).toBe('Jordan Rivera');
 
