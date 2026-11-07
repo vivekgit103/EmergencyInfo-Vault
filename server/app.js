@@ -39,7 +39,7 @@ app.use(
 // Body Parsers & Cookie Parser
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-app.use(cookieParser(process.env.COOKIE_SECRET || 'emergencyinfo_vault_cookie_secret_fallback'));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());
