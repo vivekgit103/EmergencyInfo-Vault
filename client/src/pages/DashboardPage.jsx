@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Share2, Copy, Check, ExternalLink,
-  ShieldAlert, Clock, Key, AlertTriangle, Phone, FileText
+  ShieldAlert, Clock, Key, AlertTriangle, Phone, FileText, QrCode
 } from 'lucide-react';
 import SensitiveDataNotice from '../components/SensitiveDataNotice';
 import Button from '../components/Button';
@@ -32,6 +32,7 @@ export default function DashboardPage() {
   const [editingInstruction, setEditingInstruction] = useState(null);
 
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [selectedShareLink, setSelectedShareLink] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Copy indicator state for share links
@@ -143,11 +144,13 @@ export default function DashboardPage() {
   // Share link handlers
   const handleGenerateShareLink = async ({ expiry, pin }) => {
     try {
-      await api.shareLinks.create({ expiry, pin });
+      const res = await api.shareLinks.create({ expiry, pin });
       showToast('Share link created successfully');
       fetchData();
+      return res.shareLink;
     } catch (err) {
       showToast(err.message || 'Failed to generate share link', 'danger');
+      throw err;
     }
   };
 
@@ -508,7 +511,10 @@ export default function DashboardPage() {
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => setIsShareModalOpen(true)}
+                  onClick={() => {
+                    setSelectedShareLink(null);
+                    setIsShareModalOpen(true);
+                  }}
                 >
                   <Plus size={16} aria-hidden="true" />
                   <span>Generate New Link</span>
@@ -524,7 +530,10 @@ export default function DashboardPage() {
                   </p>
                   <Button
                     variant="primary"
-                    onClick={() => setIsShareModalOpen(true)}
+                    onClick={() => {
+                      setSelectedShareLink(null);
+                      setIsShareModalOpen(true);
+                    }}
                   >
                     <Share2 size={16} aria-hidden="true" />
                     <span>Generate Your First Link</span>
@@ -589,6 +598,19 @@ export default function DashboardPage() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           {isActive && (
                             <>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedShareLink(link);
+                                  setIsShareModalOpen(true);
+                                }}
+                                aria-label="View QR code and printable emergency card"
+                              >
+                                <QrCode size={16} />
+                                <span>QR / Card</span>
+                              </Button>
+
                               <Button
                                 variant="secondary"
                                 size="sm"
@@ -676,8 +698,12 @@ export default function DashboardPage() {
 
         <ShareLinkModal
           isOpen={isShareModalOpen}
-          onClose={() => setIsShareModalOpen(false)}
+          onClose={() => {
+            setIsShareModalOpen(false);
+            setSelectedShareLink(null);
+          }}
           onGenerate={handleGenerateShareLink}
+          initialLink={selectedShareLink}
         />
 
         <DeleteAccountModal
