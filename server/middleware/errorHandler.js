@@ -55,6 +55,12 @@ const errorHandler = (err, req, res, next) => {
     statusCode = err.statusCode;
   }
 
+  // In production, never leak internal details or err.message for 500+ server errors
+  if (statusCode >= 500 && process.env.NODE_ENV === 'production') {
+    message = 'Internal server error';
+    errors = undefined;
+  }
+
   const response = {
     message,
     ...(errors && { errors })
