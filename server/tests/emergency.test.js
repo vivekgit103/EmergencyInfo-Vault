@@ -234,5 +234,49 @@ describe('Public Emergency Card Access & Security', () => {
       const dbLink = await ShareLink.findOne({ token: pinShareToken });
       expect(dbLink.pinAttempts).toBe(0);
     });
+
+    test('Automatically resets pinAttempts when a temporary lock expires', async () => {
+      // Simulate an expired lock in the database
+      await ShareLink.updateOne(
+        { token: pinShareToken },
+        { pinAttempts: 5, lockedUntil: new Date(Date.now() - 5000) }
+      );
+
+      // Status check should now succeed and reset attempts in DB
+      const statusRes = await request(app).get(`/api/emergency/${pinShareToken}`);
+      expect(statusRes.status).toBe(200);
+      expect(statusRes.body.requiresPin).toBe(true);
+
+      const dbLink = await ShareLink.findOne({ token: pinShareToken });
+      expect(dbLink.pinAttempts).toBe(0);
+      expect(dbLink.lockedUntil).toBeNull();
+
+      // Entering correct PIN now succeeds immediately
+      const res = await request(app)
+        .post(`/api/emergency/${pinShareToken}`)
+        .send({ pin: '987654' });
+      expect(res.status).toBe(200);
+      expect(res.body.ownerName).toBe('Dr. John Watson');
+    });
+
+    test('Expired lock on POST endpoint also resets attempts and allows correct PIN', async () => {
+      // Set expired lock with 5 failed attempts
+      await ShareLink.updateOne(
+        { token: pinShareToken },
+        { pinAttempts: 5, lockedUntil: new Date(Date.now() - 5000) }
+      );
+
+      // Attempting with correct PIN after expiry should reset and succeed
+      const res = await request(app)
+        .post(`/api/emergency/${pinShareToken}`)
+        .send({ pin: '987654' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.ownerName).toBe('Dr. John Watson');
+
+      const dbLink = await ShareLink.findOne({ token: pinShareToken });
+      expect(dbLink.pinAttempts).toBe(0);
+      expect(dbLink.lockedUntil).toBeNull();
+    });
   });
 });

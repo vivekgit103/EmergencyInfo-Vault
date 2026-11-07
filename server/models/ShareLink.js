@@ -48,9 +48,9 @@ const shareLinkSchema = new mongoose.Schema(
 
 // Helper method to set PIN
 shareLinkSchema.methods.setPin = async function (pin) {
-  if (pin && pin.trim().length >= 4 && pin.trim().length <= 8) {
+  if (pin && String(pin).trim().length >= 6) {
     const salt = await bcrypt.genSalt(10);
-    this.pinHash = await bcrypt.hash(pin.trim(), salt);
+    this.pinHash = await bcrypt.hash(String(pin).trim(), salt);
     this.hasPin = true;
   } else {
     this.pinHash = null;

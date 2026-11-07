@@ -80,13 +80,23 @@ const viewEmergencyCard = asyncHandler(async (req, res) => {
     });
   }
 
-  // 4. Link locked due to repeated PIN failures
-  if (shareLink.isLocked()) {
-    const minutesLeft = Math.ceil((new Date(shareLink.lockedUntil) - new Date()) / 60000);
-    return res.status(429).json({
-      message: `This emergency card is temporarily locked due to repeated incorrect PIN attempts. Please try again in ${minutesLeft} minute${minutesLeft === 1 ? '' : 's'}.`,
-      lockedUntil: shareLink.lockedUntil
-    });
+  // 4. Link locked due to repeated PIN failures (and atomic reset if lock period elapsed)
+  if (shareLink.lockedUntil) {
+    if (new Date() < shareLink.lockedUntil) {
+      const minutesLeft = Math.ceil((new Date(shareLink.lockedUntil) - new Date()) / 60000);
+      return res.status(429).json({
+        message: `This emergency card is temporarily locked due to repeated incorrect PIN attempts. Please try again in ${minutesLeft} minute${minutesLeft === 1 ? '' : 's'}.`,
+        lockedUntil: shareLink.lockedUntil
+      });
+    } else {
+      // Lock has expired: reset attempts and clear lock state atomically
+      await ShareLink.findOneAndUpdate(
+        { _id: shareLink._id },
+        { $set: { pinAttempts: 0, lockedUntil: null } }
+      );
+      shareLink.pinAttempts = 0;
+      shareLink.lockedUntil = null;
+    }
   }
 
   // 5. PIN verification
@@ -98,23 +108,32 @@ const viewEmergencyCard = asyncHandler(async (req, res) => {
       });
     }
 
-    const isMatch = await shareLink.matchPin(pin);
+    const trimmedPin = String(pin).trim();
+    const isMatch = await shareLink.matchPin(trimmedPin);
     if (!isMatch) {
-      shareLink.pinAttempts = (shareLink.pinAttempts || 0) + 1;
       const MAX_ATTEMPTS = 5;
 
-      if (shareLink.pinAttempts >= MAX_ATTEMPTS) {
-        shareLink.lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 mins lock
-        await shareLink.save();
+      // Atomic increment of PIN attempt counter with findOneAndUpdate and $inc
+      const updatedLink = await ShareLink.findOneAndUpdate(
+        { _id: shareLink._id },
+        { $inc: { pinAttempts: 1 } },
+        { new: true }
+      );
+
+      if (updatedLink.pinAttempts >= MAX_ATTEMPTS) {
+        const lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 mins lock
+        await ShareLink.findOneAndUpdate(
+          { _id: shareLink._id },
+          { $set: { lockedUntil } }
+        );
         return res.status(429).json({
           requiresPin: true,
           message: 'Too many incorrect PIN attempts. This card has been locked for 15 minutes.',
-          lockedUntil: shareLink.lockedUntil
+          lockedUntil
         });
       }
 
-      await shareLink.save();
-      const remaining = MAX_ATTEMPTS - shareLink.pinAttempts;
+      const remaining = MAX_ATTEMPTS - updatedLink.pinAttempts;
       return res.status(401).json({
         requiresPin: true,
         message: `Incorrect PIN. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining before temporary lockout.`,
@@ -122,11 +141,12 @@ const viewEmergencyCard = asyncHandler(async (req, res) => {
       });
     }
 
-    // Correct PIN: reset attempts
-    if (shareLink.pinAttempts > 0) {
-      shareLink.pinAttempts = 0;
-      shareLink.lockedUntil = null;
-      await shareLink.save();
+    // Correct PIN: reset attempts and clear lock atomically
+    if (shareLink.pinAttempts > 0 || shareLink.lockedUntil) {
+      await ShareLink.findOneAndUpdate(
+        { _id: shareLink._id },
+        { $set: { pinAttempts: 0, lockedUntil: null } }
+      );
     }
   }
 
@@ -168,12 +188,22 @@ const checkEmergencyStatus = asyncHandler(async (req, res) => {
     });
   }
 
-  if (shareLink.isLocked()) {
-    const minutesLeft = Math.ceil((new Date(shareLink.lockedUntil) - new Date()) / 60000);
-    return res.status(429).json({
-      message: `This emergency card is temporarily locked due to repeated incorrect PIN attempts. Please try again in ${minutesLeft} minute${minutesLeft === 1 ? '' : 's'}.`,
-      lockedUntil: shareLink.lockedUntil
-    });
+  if (shareLink.lockedUntil) {
+    if (new Date() < shareLink.lockedUntil) {
+      const minutesLeft = Math.ceil((new Date(shareLink.lockedUntil) - new Date()) / 60000);
+      return res.status(429).json({
+        message: `This emergency card is temporarily locked due to repeated incorrect PIN attempts. Please try again in ${minutesLeft} minute${minutesLeft === 1 ? '' : 's'}.`,
+        lockedUntil: shareLink.lockedUntil
+      });
+    } else {
+      // Lock has expired: reset attempts and clear lock state atomically
+      await ShareLink.findOneAndUpdate(
+        { _id: shareLink._id },
+        { $set: { pinAttempts: 0, lockedUntil: null } }
+      );
+      shareLink.pinAttempts = 0;
+      shareLink.lockedUntil = null;
+    }
   }
 
   if (shareLink.hasPin) {
