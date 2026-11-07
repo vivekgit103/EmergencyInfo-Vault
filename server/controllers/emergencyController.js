@@ -158,6 +158,15 @@ const viewEmergencyCard = asyncHandler(async (req, res) => {
     });
   }
 
+  // Atomically increment access counter and record timestamp (no IP or UA stored)
+  await ShareLink.findOneAndUpdate(
+    { _id: shareLink._id },
+    {
+      $inc: { accessCount: 1 },
+      $set: { lastAccessedAt: new Date() }
+    }
+  );
+
   res.status(200).json(payload);
 });
 
@@ -213,13 +222,22 @@ const checkEmergencyStatus = asyncHandler(async (req, res) => {
     });
   }
 
-  // If no PIN required, return payload directly
+  // If no PIN required, return payload directly and record access
   const payload = await getEmergencyPayload(shareLink.userId, shareLink.expiresAt);
   if (!payload) {
     return res.status(404).json({
       message: 'The owner of this emergency card could not be found.'
     });
   }
+
+  // Atomically increment access counter and record timestamp (no IP or UA stored)
+  await ShareLink.findOneAndUpdate(
+    { _id: shareLink._id },
+    {
+      $inc: { accessCount: 1 },
+      $set: { lastAccessedAt: new Date() }
+    }
+  );
 
   res.status(200).json({
     requiresPin: false,

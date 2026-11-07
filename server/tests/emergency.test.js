@@ -279,4 +279,57 @@ describe('Public Emergency Card Access & Security', () => {
       expect(dbLink.lockedUntil).toBeNull();
     });
   });
+
+  describe('Access Counter & Timestamp Tracking (Item 20)', () => {
+    test('Records access counter and lastAccessedAt without storing IP or User-Agent', async () => {
+      // 1. Initial state: accessCount 0, lastAccessedAt null
+      let link = await ShareLink.findOne({ token: normalShareToken });
+      expect(link.accessCount).toBe(0);
+      expect(link.lastAccessedAt).toBeNull();
+
+      // 2. First public access via GET (normal link without PIN)
+      const res1 = await request(app)
+        .get(`/api/emergency/${normalShareToken}`)
+        .set('User-Agent', 'Mozilla/5.0 EmergencyResponder')
+        .set('X-Forwarded-For', '203.0.113.195');
+
+      expect(res1.status).toBe(200);
+
+      link = await ShareLink.findOne({ token: normalShareToken });
+      expect(link.accessCount).toBe(1);
+      expect(link.lastAccessedAt).toBeInstanceOf(Date);
+      expect(Math.abs(Date.now() - link.lastAccessedAt.getTime())).toBeLessThan(5000);
+
+      // Verify privacy: no IP or User-Agent logged on the document
+      const rawDoc = link.toObject();
+      expect(rawDoc.ip).toBeUndefined();
+      expect(rawDoc.ipAddress).toBeUndefined();
+      expect(rawDoc.userAgent).toBeUndefined();
+      expect(rawDoc.ua).toBeUndefined();
+
+      // 3. Second access via POST (PIN link with correct PIN)
+      let pinLink = await ShareLink.findOne({ token: pinShareToken });
+      expect(pinLink.accessCount).toBe(0);
+
+      const res2 = await request(app)
+        .post(`/api/emergency/${pinShareToken}`)
+        .set('User-Agent', 'Paramedic Tablet')
+        .set('X-Forwarded-For', '198.51.100.42')
+        .send({ pin: '987654' });
+
+      expect(res2.status).toBe(200);
+
+      pinLink = await ShareLink.findOne({ token: pinShareToken });
+      expect(pinLink.accessCount).toBe(1);
+      expect(pinLink.lastAccessedAt).toBeInstanceOf(Date);
+
+      // 4. Repeated access increments counter again
+      await request(app)
+        .post(`/api/emergency/${pinShareToken}`)
+        .send({ pin: '987654' });
+
+      pinLink = await ShareLink.findOne({ token: pinShareToken });
+      expect(pinLink.accessCount).toBe(2);
+    });
+  });
 });

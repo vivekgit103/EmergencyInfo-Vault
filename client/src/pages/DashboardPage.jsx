@@ -577,6 +577,12 @@ export default function DashboardPage() {
                           <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
                             <span>Created: {new Date(link.createdAt).toLocaleString()}</span>
                             <span>Expires: {new Date(link.expiresAt).toLocaleString()}</span>
+                            <span>Views: {link.accessCount || 0}</span>
+                            <span>
+                              {link.lastAccessedAt
+                                ? `Last viewed: ${new Date(link.lastAccessedAt).toLocaleString()}`
+                                : 'Never accessed'}
+                            </span>
                           </div>
                         </div>
 

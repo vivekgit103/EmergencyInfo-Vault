@@ -37,6 +37,14 @@ const shareLinkSchema = new mongoose.Schema(
     lockedUntil: {
       type: Date,
       default: null
+    },
+    accessCount: {
+      type: Number,
+      default: 0
+    },
+    lastAccessedAt: {
+      type: Date,
+      default: null
     }
   },
   {
