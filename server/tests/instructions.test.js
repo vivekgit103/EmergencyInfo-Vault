@@ -200,4 +200,37 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
 
     expect(deleteRes.status).toBe(404);
   });
+
+  test('Per-user limit: rejects adding more than 20 instructions with a 400 error', async () => {
+    const Instruction = require('../models/Instruction');
+    const User = require('../models/User');
+    const user = await User.findOne({ email: 'instruction_a@example.com' });
+    await Instruction.deleteMany({ userId: user._id });
+
+    // Create 20 instructions
+    for (let i = 1; i <= 20; i++) {
+      const res = await request(app)
+        .post('/api/instructions')
+        .set('Cookie', cookieUserA)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .send({
+          title: `Instruction ${i}`,
+          text: `Important emergency detail number ${i}`
+        });
+      expect(res.status).toBe(201);
+    }
+
+    // 21st instruction should be rejected with 400
+    const overLimitRes = await request(app)
+      .post('/api/instructions')
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({
+        title: 'Over Limit Instruction',
+        text: 'This should fail because limit is 20'
+      });
+
+    expect(overLimitRes.status).toBe(400);
+    expect(overLimitRes.body.message).toMatch(/limit of 20 instructions/i);
+  });
 });

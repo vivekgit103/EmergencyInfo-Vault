@@ -175,4 +175,48 @@ describe('Share Links Management', () => {
     expect(tokenIndexes.length).toBe(1);
     expect(tokenIndexes[0][1]).toHaveProperty('unique', true);
   });
+
+  test('Per-user limit: rejects creating more than 5 active share links with a 400 error', async () => {
+    // Delete existing links for User A in this test run
+    const User = require('../models/User');
+    const user = await User.findOne({ email: 'link_a@example.com' });
+    await ShareLink.deleteMany({ userId: user._id });
+
+    const createdIds = [];
+    // Create 5 active share links
+    for (let i = 1; i <= 5; i++) {
+      const res = await request(app)
+        .post('/api/share-links')
+        .set('Cookie', cookieUserA)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .send({ expiry: '24h' });
+      expect(res.status).toBe(201);
+      createdIds.push(res.body.shareLink._id);
+    }
+
+    // 6th link creation should be rejected with 400
+    const overLimitRes = await request(app)
+      .post('/api/share-links')
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({ expiry: '24h' });
+
+    expect(overLimitRes.status).toBe(400);
+    expect(overLimitRes.body.message).toMatch(/limit of 5 active share links/i);
+
+    // Revoking one active link frees up a slot
+    await request(app)
+      .delete(`/api/share-links/${createdIds[0]}`)
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest');
+
+    // Now creation of another link succeeds
+    const allowedRes = await request(app)
+      .post('/api/share-links')
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({ expiry: '24h' });
+
+    expect(allowedRes.status).toBe(201);
+  });
 });

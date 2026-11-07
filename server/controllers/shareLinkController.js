@@ -28,6 +28,17 @@ const getShareLinks = asyncHandler(async (req, res) => {
  * @access  Private
  */
 const createShareLink = asyncHandler(async (req, res) => {
+  const activeCount = await ShareLink.countDocuments({
+    userId: req.user._id,
+    isRevoked: false,
+    expiresAt: { $gt: new Date() }
+  });
+  if (activeCount >= 5) {
+    return res.status(400).json({
+      message: 'Maximum limit of 5 active share links reached. Please revoke or let existing links expire before creating a new one.'
+    });
+  }
+
   const { expiry = '24h', pin } = req.body;
 
   // Trim and validate PIN in controller as defense-in-depth:

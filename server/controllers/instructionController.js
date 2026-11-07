@@ -20,6 +20,13 @@ const getInstructions = asyncHandler(async (req, res) => {
  * @access  Private
  */
 const createInstruction = asyncHandler(async (req, res) => {
+  const existingCount = await Instruction.countDocuments({ userId: req.user._id });
+  if (existingCount >= 20) {
+    return res.status(400).json({
+      message: 'Maximum limit of 20 instructions reached. Please remove an existing instruction before adding a new one.'
+    });
+  }
+
   const { title, text, showInEmergency } = req.body;
 
   const instruction = await Instruction.create({

@@ -237,4 +237,40 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     expect(listA.body.contacts.length).toBe(1);
     expect(listA.body.contacts[0].name).toBe('User A Secret Contact');
   });
+
+  test('Per-user limit: rejects adding more than 10 contacts with a 400 error', async () => {
+    // Delete any existing contacts for User A in this test run
+    const Contact = require('../models/Contact');
+    const User = require('../models/User');
+    const user = await User.findOne({ email: 'usera@example.com' });
+    await Contact.deleteMany({ userId: user._id });
+
+    // Create 10 contacts
+    for (let i = 1; i <= 10; i++) {
+      const res = await request(app)
+        .post('/api/contacts')
+        .set('Cookie', cookieUserA)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .send({
+          name: `Contact ${i}`,
+          relationship: 'Friend',
+          phone: `+1-555-010${i}`
+        });
+      expect(res.status).toBe(201);
+    }
+
+    // 11th contact should be rejected with 400
+    const overLimitRes = await request(app)
+      .post('/api/contacts')
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({
+        name: 'Over Limit Contact',
+        relationship: 'Doctor',
+        phone: '+1-555-0199'
+      });
+
+    expect(overLimitRes.status).toBe(400);
+    expect(overLimitRes.body.message).toMatch(/limit of 10 contacts/i);
+  });
 });

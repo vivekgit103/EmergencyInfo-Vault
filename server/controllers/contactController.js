@@ -28,6 +28,13 @@ const getContacts = asyncHandler(async (req, res) => {
  * @access  Private
  */
 const createContact = asyncHandler(async (req, res) => {
+  const existingCount = await Contact.countDocuments({ userId: req.user._id });
+  if (existingCount >= 10) {
+    return res.status(400).json({
+      message: 'Maximum limit of 10 contacts reached. Please remove an existing contact before adding a new one.'
+    });
+  }
+
   const { name, relationship, phone, priority, showInEmergency } = req.body;
 
   const contact = await Contact.create({
