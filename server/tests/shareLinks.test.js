@@ -162,4 +162,17 @@ describe('Share Links Management', () => {
 
     expect(revokeRes.status).toBe(404);
   });
+
+  test('ShareLink schema configures 7-day TTL index on expiresAt without duplicate token index', () => {
+    const indexes = ShareLink.schema.indexes();
+    // Look for TTL index on expiresAt
+    const ttlIndex = indexes.find(idx => idx[0] && idx[0].expiresAt === 1);
+    expect(ttlIndex).toBeDefined();
+    expect(ttlIndex[1]).toHaveProperty('expireAfterSeconds', 604800);
+
+    // Verify token has exactly one index definition (unique)
+    const tokenIndexes = indexes.filter(idx => idx[0] && idx[0].token === 1);
+    expect(tokenIndexes.length).toBe(1);
+    expect(tokenIndexes[0][1]).toHaveProperty('unique', true);
+  });
 });

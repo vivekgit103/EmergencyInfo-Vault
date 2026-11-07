@@ -37,8 +37,8 @@ const createContactValidation = [
     .withMessage('Priority must be primary, secondary, or other'),
   body('showInEmergency')
     .optional()
-    .isBoolean()
-    .withMessage('showInEmergency must be a boolean')
+    .isBoolean({ strict: true })
+    .withMessage('showInEmergency must be a boolean (true or false)')
 ];
 
 const updateContactValidation = [
@@ -69,8 +69,8 @@ const updateContactValidation = [
     .withMessage('Priority must be primary, secondary, or other'),
   body('showInEmergency')
     .optional()
-    .isBoolean()
-    .withMessage('showInEmergency must be a boolean')
+    .isBoolean({ strict: true })
+    .withMessage('showInEmergency must be a boolean (true or false)')
 ];
 
 // All contact routes are protected

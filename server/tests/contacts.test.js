@@ -82,6 +82,22 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     expect(res.body.errors.some(e => e.field === 'phone')).toBe(true);
   });
 
+  test('Contact validation strictly rejects string "false" for showInEmergency', async () => {
+    const res = await request(app)
+      .post('/api/contacts')
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({
+        name: 'Boolean Test',
+        relationship: 'Friend',
+        phone: '+1-555-0188',
+        showInEmergency: 'false'
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.errors.some(e => e.field === 'showInEmergency')).toBe(true);
+  });
+
   describe('Contact Sensitive-Data Guard', () => {
     test('Rejects contact name containing 12-digit national ID (1234 5678 9012)', async () => {
       const res = await request(app)

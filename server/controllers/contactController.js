@@ -36,7 +36,7 @@ const createContact = asyncHandler(async (req, res) => {
     relationship,
     phone,
     priority: priority || 'primary',
-    showInEmergency: showInEmergency !== undefined ? Boolean(showInEmergency) : true
+    showInEmergency: typeof showInEmergency === 'boolean' ? showInEmergency : true
   });
 
   res.status(201).json({
@@ -65,7 +65,7 @@ const updateContact = asyncHandler(async (req, res) => {
   if (relationship !== undefined) contact.relationship = relationship;
   if (phone !== undefined) contact.phone = phone;
   if (priority !== undefined) contact.priority = priority;
-  if (showInEmergency !== undefined) contact.showInEmergency = Boolean(showInEmergency);
+  if (typeof showInEmergency === 'boolean') contact.showInEmergency = showInEmergency;
 
   const updatedContact = await contact.save();
 

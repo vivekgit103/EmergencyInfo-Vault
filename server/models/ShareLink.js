@@ -12,8 +12,7 @@ const shareLinkSchema = new mongoose.Schema(
     token: {
       type: String,
       required: true,
-      unique: true,
-      index: true
+      unique: true
     },
     hasPin: {
       type: Boolean,
@@ -25,8 +24,7 @@ const shareLinkSchema = new mongoose.Schema(
     },
     expiresAt: {
       type: Date,
-      required: true,
-      index: true
+      required: true
     },
     isRevoked: {
       type: Boolean,
@@ -45,6 +43,9 @@ const shareLinkSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+// TTL index with a 7-day buffer (604,800 seconds) after expiry date
+shareLinkSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 7 * 24 * 3600 });
 
 // Helper method to set PIN
 shareLinkSchema.methods.setPin = async function (pin) {

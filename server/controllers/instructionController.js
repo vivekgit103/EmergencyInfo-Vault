@@ -26,7 +26,7 @@ const createInstruction = asyncHandler(async (req, res) => {
     userId: req.user._id,
     title,
     text,
-    showInEmergency: showInEmergency !== undefined ? Boolean(showInEmergency) : true
+    showInEmergency: typeof showInEmergency === 'boolean' ? showInEmergency : true
   });
 
   res.status(201).json({
@@ -53,7 +53,7 @@ const updateInstruction = asyncHandler(async (req, res) => {
 
   if (title !== undefined) instruction.title = title;
   if (text !== undefined) instruction.text = text;
-  if (showInEmergency !== undefined) instruction.showInEmergency = Boolean(showInEmergency);
+  if (typeof showInEmergency === 'boolean') instruction.showInEmergency = showInEmergency;
 
   const updatedInstruction = await instruction.save();
 

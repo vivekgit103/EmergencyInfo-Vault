@@ -27,8 +27,8 @@ const createInstructionValidation = [
     .withMessage('Instruction text cannot exceed 300 characters'),
   body('showInEmergency')
     .optional()
-    .isBoolean()
-    .withMessage('showInEmergency must be a boolean')
+    .isBoolean({ strict: true })
+    .withMessage('showInEmergency must be a boolean (true or false)')
 ];
 
 const updateInstructionValidation = [
@@ -48,8 +48,8 @@ const updateInstructionValidation = [
     .withMessage('Instruction text cannot exceed 300 characters'),
   body('showInEmergency')
     .optional()
-    .isBoolean()
-    .withMessage('showInEmergency must be a boolean')
+    .isBoolean({ strict: true })
+    .withMessage('showInEmergency must be a boolean (true or false)')
 ];
 
 // All instruction routes are protected

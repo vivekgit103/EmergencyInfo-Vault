@@ -71,6 +71,21 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     expect(resText.status).toBe(400);
   });
 
+  test('Instruction validation strictly rejects string "false" for showInEmergency', async () => {
+    const res = await request(app)
+      .post('/api/instructions')
+      .set('Cookie', cookieUserA)
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({
+        title: 'Valid Title',
+        text: 'Valid text',
+        showInEmergency: 'false'
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.errors.some(e => e.field === 'showInEmergency')).toBe(true);
+  });
+
   describe('Sensitive-Data Guard Enforcement', () => {
     test('Rejects instruction containing formatted 12-digit ID number (Aadhaar format)', async () => {
       const res = await request(app)
