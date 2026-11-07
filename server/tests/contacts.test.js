@@ -82,6 +82,53 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     expect(res.body.errors.some(e => e.field === 'phone')).toBe(true);
   });
 
+  describe('Contact Sensitive-Data Guard', () => {
+    test('Rejects contact name containing 12-digit national ID (1234 5678 9012)', async () => {
+      const res = await request(app)
+        .post('/api/contacts')
+        .set('Cookie', cookieUserA)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .send({
+          name: 'Jane 1234 5678 9012',
+          relationship: 'Sister',
+          phone: '+1-555-0100'
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/sensitive data/i);
+    });
+
+    test('Rejects contact relationship containing real credit card number', async () => {
+      const res = await request(app)
+        .post('/api/contacts')
+        .set('Cookie', cookieUserA)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .send({
+          name: 'John Doe',
+          relationship: 'Card 4111 1111 1111 1111',
+          phone: '+1-555-0100'
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/sensitive data/i);
+    });
+
+    test('Does NOT reject two phone numbers in contact information', async () => {
+      const res = await request(app)
+        .post('/api/contacts')
+        .set('Cookie', cookieUserA)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .send({
+          name: 'Alice 9876543210 9123456789',
+          relationship: 'Colleague',
+          phone: '+1-555-0199'
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.contact).toBeDefined();
+    });
+  });
+
   test('User A can update and delete their own contact', async () => {
     const createRes = await request(app)
       .post('/api/contacts')

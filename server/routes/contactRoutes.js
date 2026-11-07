@@ -8,6 +8,7 @@ const {
 } = require('../controllers/contactController');
 const { protect } = require('../middleware/authMiddleware');
 const validate = require('../middleware/validateMiddleware');
+const sensitiveDataGuard = require('../middleware/sensitiveDataGuard');
 
 const router = express.Router();
 
@@ -77,10 +78,10 @@ router.use(protect);
 
 router.route('/')
   .get(getContacts)
-  .post(createContactValidation, validate, createContact);
+  .post(createContactValidation, validate, sensitiveDataGuard, createContact);
 
 router.route('/:id')
-  .put(updateContactValidation, validate, updateContact)
+  .put(updateContactValidation, validate, sensitiveDataGuard, updateContact)
   .delete(deleteContact);
 
 module.exports = router;

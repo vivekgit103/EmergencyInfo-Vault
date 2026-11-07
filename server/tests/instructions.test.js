@@ -104,28 +104,42 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
       const res = await request(app)
         .post('/api/instructions')
         .set('Cookie', cookieUserA)
-      .set('X-Requested-With', 'XMLHttpRequest')
+        .set('X-Requested-With', 'XMLHttpRequest')
         .send({
           title: 'Emergency card for expenses',
-          text: 'Card details: 4111 2222 3333 4444'
+          text: 'Card details: 4111 1111 1111 1111'
         });
 
       expect(res.status).toBe(400);
       expect(res.body.message).toMatch(/sensitive data/i);
     });
 
-    test('Rejects instruction containing unformatted 16-digit number in title or text', async () => {
+    test('Rejects instruction containing unformatted 16-digit real card number in title or text', async () => {
       const res = await request(app)
         .post('/api/instructions')
         .set('Cookie', cookieUserA)
-      .set('X-Requested-With', 'XMLHttpRequest')
+        .set('X-Requested-With', 'XMLHttpRequest')
         .send({
-          title: 'Card 1234567890123456',
+          title: 'Card 4242424242424242',
           text: 'Call bank'
         });
 
       expect(res.status).toBe(400);
       expect(res.body.message).toMatch(/sensitive data/i);
+    });
+
+    test('Does NOT reject two consecutive phone numbers like 9876543210 9123456789', async () => {
+      const res = await request(app)
+        .post('/api/instructions')
+        .set('Cookie', cookieUserA)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .send({
+          title: 'Emergency Contacts Info',
+          text: 'Call backup numbers: 9876543210 9123456789 if unreachable'
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.instruction).toBeDefined();
     });
 
     test('Accepts valid safe instructions with harmless numbers (dosages, apartment, times)', async () => {

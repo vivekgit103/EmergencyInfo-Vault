@@ -5,7 +5,7 @@ const { detectSensitiveData } = require('../utils/sensitivePatterns');
  * Rejects instruction titles or text containing 12-digit IDs or 13-19 digit card numbers
  */
 const sensitiveDataGuard = (req, res, next) => {
-  const fieldsToCheck = ['title', 'text'];
+  const fieldsToCheck = ['title', 'text', 'name', 'relationship'];
 
   for (const field of fieldsToCheck) {
     if (req.body && req.body[field]) {
