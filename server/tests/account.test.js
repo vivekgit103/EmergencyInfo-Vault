@@ -6,7 +6,7 @@ const Instruction = require('../models/Instruction');
 const ShareLink = require('../models/ShareLink');
 
 describe('Account Deletion & Data Cascade', () => {
-  let token;
+  let authCookie;
   let userId;
 
   beforeEach(async () => {
@@ -16,13 +16,13 @@ describe('Account Deletion & Data Cascade', () => {
       email: 'delete_me@example.com',
       password: 'password123'
     });
-    token = res.body.token;
+    authCookie = res.headers['set-cookie'];
     userId = res.body.user.id;
 
     // Create a contact
     await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', authCookie)
       .send({
         name: 'Contact to delete',
         relationship: 'Friend',
@@ -32,7 +32,7 @@ describe('Account Deletion & Data Cascade', () => {
     // Create an instruction
     await request(app)
       .post('/api/instructions')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', authCookie)
       .send({
         title: 'Instruction to delete',
         text: 'This should be wiped out completely.'
@@ -41,14 +41,14 @@ describe('Account Deletion & Data Cascade', () => {
     // Create a share link
     await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', authCookie)
       .send({ expiry: '24h' });
   });
 
   test('DELETE /api/account fails without password confirmation', async () => {
     const res = await request(app)
       .delete('/api/account')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', authCookie)
       .send({});
 
     expect(res.status).toBe(400);
@@ -58,7 +58,7 @@ describe('Account Deletion & Data Cascade', () => {
   test('DELETE /api/account fails with incorrect password', async () => {
     const res = await request(app)
       .delete('/api/account')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', authCookie)
       .send({ password: 'wrongpassword' });
 
     expect(res.status).toBe(401);
@@ -75,7 +75,7 @@ describe('Account Deletion & Data Cascade', () => {
     // Perform deletion with correct password
     const res = await request(app)
       .delete('/api/account')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', authCookie)
       .send({ password: 'password123' });
 
     expect(res.status).toBe(200);

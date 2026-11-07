@@ -3,7 +3,7 @@ const app = require('../app');
 const ShareLink = require('../models/ShareLink');
 
 describe('Public Emergency Card Access & Security', () => {
-  let tokenUser;
+  let cookieUser;
   let normalShareToken;
   let pinShareToken;
 
@@ -14,13 +14,13 @@ describe('Public Emergency Card Access & Security', () => {
       email: 'watson@example.com',
       password: 'password123'
     });
-    tokenUser = res.body.token;
+    cookieUser = res.headers['set-cookie'];
 
     // Create Emergency Contacts
     // 1. Secondary visible
     await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUser}`)
+      .set('Cookie', cookieUser)
       .send({
         name: 'Mrs. Hudson',
         relationship: 'Landlady',
@@ -32,7 +32,7 @@ describe('Public Emergency Card Access & Security', () => {
     // 2. Primary visible
     await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUser}`)
+      .set('Cookie', cookieUser)
       .send({
         name: 'Sherlock Holmes',
         relationship: 'Partner',
@@ -44,7 +44,7 @@ describe('Public Emergency Card Access & Security', () => {
     // 3. Other - HIDDEN in emergency
     await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUser}`)
+      .set('Cookie', cookieUser)
       .send({
         name: 'Inspector Lestrade',
         relationship: 'Colleague',
@@ -57,7 +57,7 @@ describe('Public Emergency Card Access & Security', () => {
     // Visible
     await request(app)
       .post('/api/instructions')
-      .set('Authorization', `Bearer ${tokenUser}`)
+      .set('Cookie', cookieUser)
       .send({
         title: 'Penicillin Allergy',
         text: 'Patient has severe anaphylactic reaction to penicillin.',
@@ -67,7 +67,7 @@ describe('Public Emergency Card Access & Security', () => {
     // Hidden in emergency
     await request(app)
       .post('/api/instructions')
-      .set('Authorization', `Bearer ${tokenUser}`)
+      .set('Cookie', cookieUser)
       .send({
         title: 'Desk Safe Combination',
         text: 'The desk safe code is 3829.',
@@ -77,14 +77,14 @@ describe('Public Emergency Card Access & Security', () => {
     // Create Normal Share Link
     const normalLinkRes = await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${tokenUser}`)
+      .set('Cookie', cookieUser)
       .send({ expiry: '24h' });
     normalShareToken = normalLinkRes.body.shareLink.token;
 
     // Create PIN protected Share Link
     const pinLinkRes = await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${tokenUser}`)
+      .set('Cookie', cookieUser)
       .send({ expiry: '24h', pin: '9876' });
     pinShareToken = pinLinkRes.body.shareLink.token;
   });

@@ -16,8 +16,9 @@ describe('Full End-to-End User Flow', () => {
         password: 'SecurePassword123!'
       });
     expect(regRes.status).toBe(201);
-    const token = regRes.body.token;
-    expect(token).toBeDefined();
+    expect(regRes.body).not.toHaveProperty('token');
+    const authCookie = regRes.headers['set-cookie'];
+    expect(authCookie).toBeDefined();
 
     // 2. Login
     const loginRes = await request(app)
@@ -27,12 +28,14 @@ describe('Full End-to-End User Flow', () => {
         password: 'SecurePassword123!'
       });
     expect(loginRes.status).toBe(200);
+    expect(loginRes.body).not.toHaveProperty('token');
     expect(loginRes.body.user.email).toBe('jordan@example.com');
+    const sessionCookie = loginRes.headers['set-cookie'];
 
     // 3. Add Primary Contact
     const contact1Res = await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', sessionCookie)
       .send({
         name: 'Morgan Rivera',
         relationship: 'Spouse',
@@ -46,7 +49,7 @@ describe('Full End-to-End User Flow', () => {
     // Add Secondary Contact
     const contact2Res = await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', sessionCookie)
       .send({
         name: 'Dr. Evelyn Reed',
         relationship: 'Cardiologist',
@@ -59,7 +62,7 @@ describe('Full End-to-End User Flow', () => {
     // 4. Add Instruction
     const instRes = await request(app)
       .post('/api/instructions')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', sessionCookie)
       .send({
         title: 'Heart Medication',
         text: 'Takes 10mg Lisinopril daily. Water bottle in gym bag.',
@@ -71,7 +74,7 @@ describe('Full End-to-End User Flow', () => {
     // 5. Sensitive data guard test
     const sensitiveRes = await request(app)
       .post('/api/instructions')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', sessionCookie)
       .send({
         title: 'Forbidden ID',
         text: 'My ID is 9876 5432 1098'
@@ -82,7 +85,7 @@ describe('Full End-to-End User Flow', () => {
     // 6. Toggle Visibility
     const toggleRes = await request(app)
       .put(`/api/contacts/${contact1Id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', sessionCookie)
       .send({ showInEmergency: false });
     expect(toggleRes.status).toBe(200);
     expect(toggleRes.body.contact.showInEmergency).toBe(false);
@@ -90,13 +93,13 @@ describe('Full End-to-End User Flow', () => {
     // Toggle it back to true
     await request(app)
       .put(`/api/contacts/${contact1Id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', sessionCookie)
       .send({ showInEmergency: true });
 
     // 7. Generate Share Link with 24h expiry
     const linkRes = await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', sessionCookie)
       .send({ expiry: '24h' });
     expect(linkRes.status).toBe(201);
     const publicToken = linkRes.body.shareLink.token;
@@ -117,7 +120,7 @@ describe('Full End-to-End User Flow', () => {
     // 9. Revoke share link
     const revokeRes = await request(app)
       .delete(`/api/share-links/${linkId}`)
-      .set('Authorization', `Bearer ${token}`);
+      .set('Cookie', sessionCookie);
     expect(revokeRes.status).toBe(200);
 
     // Try opening revoked link logged-out
@@ -130,7 +133,7 @@ describe('Full End-to-End User Flow', () => {
     // 10. Generate link with PIN
     const pinLinkRes = await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', sessionCookie)
       .send({ expiry: '7d', pin: '8899' });
     const pinToken = pinLinkRes.body.shareLink.token;
 
@@ -152,7 +155,7 @@ describe('Full End-to-End User Flow', () => {
     // 11. Delete Account Cascade
     const deleteAccRes = await request(app)
       .delete('/api/account')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Cookie', sessionCookie)
       .send({ password: 'SecurePassword123!' });
     expect(deleteAccRes.status).toBe(200);
 

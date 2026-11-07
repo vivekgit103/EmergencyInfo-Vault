@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { api, setAuthToken } from '../services/api';
+import { api } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check current session on mount
+  // Check current session on mount via httpOnly cookie
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -15,7 +15,6 @@ export const AuthProvider = ({ children }) => {
         setUser(data.user);
       } catch (err) {
         setUser(null);
-        setAuthToken(null);
       } finally {
         setLoading(false);
       }
@@ -26,18 +25,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const data = await api.auth.login({ email, password });
-    if (data.token) {
-      setAuthToken(data.token);
-    }
     setUser(data.user);
     return data;
   };
 
   const register = async (name, email, password) => {
     const data = await api.auth.register({ name, email, password });
-    if (data.token) {
-      setAuthToken(data.token);
-    }
     setUser(data.user);
     return data;
   };
@@ -48,14 +41,12 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       // Ignore logout errors
     } finally {
-      setAuthToken(null);
       setUser(null);
     }
   };
 
   const deleteAccount = async (password) => {
     const res = await api.account.deleteAccount(password);
-    setAuthToken(null);
     setUser(null);
     return res;
   };

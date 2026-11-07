@@ -2,8 +2,8 @@ const request = require('supertest');
 const app = require('../app');
 
 describe('Instructions CRUD & Sensitive Data Guard', () => {
-  let tokenUserA;
-  let tokenUserB;
+  let cookieUserA;
+  let cookieUserB;
 
   beforeEach(async () => {
     const resA = await request(app).post('/api/auth/register').send({
@@ -11,20 +11,20 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
       email: 'instruction_a@example.com',
       password: 'password123'
     });
-    tokenUserA = resA.body.token;
+    cookieUserA = resA.headers['set-cookie'];
 
     const resB = await request(app).post('/api/auth/register').send({
       name: 'User B',
       email: 'instruction_b@example.com',
       password: 'password123'
     });
-    tokenUserB = resB.body.token;
+    cookieUserB = resB.headers['set-cookie'];
   });
 
   test('Valid instruction can be created and retrieved', async () => {
     const res = await request(app)
       .post('/api/instructions')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({
         title: 'Asthma Inhaler',
         text: 'Inhaler is in the left bag pocket. Take 2 puffs in emergency.',
@@ -36,7 +36,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
 
     const listRes = await request(app)
       .get('/api/instructions')
-      .set('Authorization', `Bearer ${tokenUserA}`);
+      .set('Cookie', cookieUserA);
 
     expect(listRes.status).toBe(200);
     expect(listRes.body.instructions.length).toBe(1);
@@ -48,7 +48,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
 
     const resTitle = await request(app)
       .post('/api/instructions')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({
         title: longTitle,
         text: 'Normal text'
@@ -58,7 +58,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
 
     const resText = await request(app)
       .post('/api/instructions')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({
         title: 'Normal Title',
         text: longText
@@ -71,7 +71,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     test('Rejects instruction containing formatted 12-digit ID number (Aadhaar format)', async () => {
       const res = await request(app)
         .post('/api/instructions')
-        .set('Authorization', `Bearer ${tokenUserA}`)
+        .set('Cookie', cookieUserA)
         .send({
           title: 'My ID info',
           text: 'My government ID number is 1234 5678 9012 please check'
@@ -84,7 +84,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     test('Rejects instruction containing continuous 12-digit number', async () => {
       const res = await request(app)
         .post('/api/instructions')
-        .set('Authorization', `Bearer ${tokenUserA}`)
+        .set('Cookie', cookieUserA)
         .send({
           title: 'ID Number',
           text: 'National ID: 987654321098'
@@ -97,7 +97,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     test('Rejects instruction containing 16-digit credit card number', async () => {
       const res = await request(app)
         .post('/api/instructions')
-        .set('Authorization', `Bearer ${tokenUserA}`)
+        .set('Cookie', cookieUserA)
         .send({
           title: 'Emergency card for expenses',
           text: 'Card details: 4111 2222 3333 4444'
@@ -110,7 +110,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     test('Rejects instruction containing unformatted 16-digit number in title or text', async () => {
       const res = await request(app)
         .post('/api/instructions')
-        .set('Authorization', `Bearer ${tokenUserA}`)
+        .set('Cookie', cookieUserA)
         .send({
           title: 'Card 1234567890123456',
           text: 'Call bank'
@@ -123,7 +123,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     test('Accepts valid safe instructions with harmless numbers (dosages, apartment, times)', async () => {
       const res = await request(app)
         .post('/api/instructions')
-        .set('Authorization', `Bearer ${tokenUserA}`)
+        .set('Cookie', cookieUserA)
         .send({
           title: 'Medication Schedule',
           text: 'Take 2 pills of 500mg Metformin at 8:00 AM. Apartment number is 402B.'
@@ -136,7 +136,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
   test('User Data Isolation: User B cannot edit or delete User A instruction', async () => {
     const createRes = await request(app)
       .post('/api/instructions')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({
         title: 'Secret Info',
         text: 'Only for User A'
@@ -147,7 +147,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     // User B tries to update
     const updateRes = await request(app)
       .put(`/api/instructions/${instId}`)
-      .set('Authorization', `Bearer ${tokenUserB}`)
+      .set('Cookie', cookieUserB)
       .send({ title: 'Tampered' });
 
     expect(updateRes.status).toBe(404);
@@ -155,7 +155,7 @@ describe('Instructions CRUD & Sensitive Data Guard', () => {
     // User B tries to delete
     const deleteRes = await request(app)
       .delete(`/api/instructions/${instId}`)
-      .set('Authorization', `Bearer ${tokenUserB}`);
+      .set('Cookie', cookieUserB);
 
     expect(deleteRes.status).toBe(404);
   });

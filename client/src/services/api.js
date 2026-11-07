@@ -1,35 +1,15 @@
 /**
  * Centralized API Client for EmergencyInfo Vault
- * Supports both httpOnly cookies and Authorization Bearer header
+ * Cookie-only authentication via httpOnly cookies
  */
 
 const API_BASE = '/api';
-
-let authToken = localStorage.getItem('emergencyinfo_token') || null;
-
-export const setAuthToken = (token) => {
-  authToken = token;
-  if (token) {
-    localStorage.setItem('emergencyinfo_token', token);
-  } else {
-    localStorage.removeItem('emergencyinfo_token');
-  }
-};
-
-export const getStoredAuthToken = () => {
-  return authToken || localStorage.getItem('emergencyinfo_token');
-};
 
 const request = async (endpoint, options = {}) => {
   const headers = {
     'Content-Type': 'application/json',
     ...(options.headers || {})
   };
-
-  const token = getStoredAuthToken();
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
 
   let response;
   try {

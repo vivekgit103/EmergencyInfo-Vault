@@ -32,13 +32,13 @@ describe('Auth Endpoints & Validation', () => {
     expect(res.body.errors.some((e) => e.field === 'password')).toBe(true);
   });
 
-  test('POST /api/auth/register successfully registers new user and sets cookie', async () => {
+  test('POST /api/auth/register successfully registers new user and sets cookie, no token in body', async () => {
     const res = await request(app)
       .post('/api/auth/register')
       .send(validUserData);
 
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('token');
+    expect(res.body).not.toHaveProperty('token');
     expect(res.body.user).toHaveProperty('email', 'jane@example.com');
     expect(res.body.user).not.toHaveProperty('password');
 
@@ -75,7 +75,7 @@ describe('Auth Endpoints & Validation', () => {
     expect(res.body.message).toMatch(/invalid/i);
   });
 
-  test('POST /api/auth/login succeeds with correct credentials', async () => {
+  test('POST /api/auth/login succeeds with correct credentials and returns no token in body', async () => {
     await request(app).post('/api/auth/register').send(validUserData);
 
     const res = await request(app)
@@ -83,8 +83,12 @@ describe('Auth Endpoints & Validation', () => {
       .send({ email: 'jane@example.com', password: 'password123' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('token');
+    expect(res.body).not.toHaveProperty('token');
     expect(res.body.user.email).toBe('jane@example.com');
+
+    const cookies = res.headers['set-cookie'];
+    expect(cookies).toBeDefined();
+    expect(cookies.some((c) => c.startsWith('token='))).toBe(true);
   });
 
   test('GET /api/auth/me returns 401 when unauthenticated', async () => {
@@ -92,17 +96,35 @@ describe('Auth Endpoints & Validation', () => {
     expect(res.status).toBe(401);
   });
 
-  test('GET /api/auth/me returns user profile when authenticated via Bearer token', async () => {
+  test('GET /api/auth/me returns user profile when authenticated via cookie', async () => {
     const regRes = await request(app).post('/api/auth/register').send(validUserData);
-    const token = regRes.body.token;
+    const cookies = regRes.headers['set-cookie'];
+
+    const res = await request(app)
+      .get('/api/auth/me')
+      .set('Cookie', cookies);
+
+    expect(res.status).toBe(200);
+    expect(res.body.user).toHaveProperty('email', 'jane@example.com');
+    expect(res.body.user).not.toHaveProperty('password');
+  });
+
+  test('GET /api/auth/me rejects Bearer token when no cookie is sent (cookie-only auth)', async () => {
+    const jwt = require('jsonwebtoken');
+    const { generateToken } = require('../utils/tokenUtils');
+    const dbUser = await User.create({
+      name: 'Bearer Test',
+      email: 'bearer@example.com',
+      password: 'password123'
+    });
+    const token = generateToken(dbUser._id);
 
     const res = await request(app)
       .get('/api/auth/me')
       .set('Authorization', `Bearer ${token}`);
 
-    expect(res.status).toBe(200);
-    expect(res.body.user).toHaveProperty('email', 'jane@example.com');
-    expect(res.body.user).not.toHaveProperty('password');
+    expect(res.status).toBe(401);
+    expect(res.body.message).toMatch(/authentication required/i);
   });
 
   test('POST /api/auth/logout clears authentication cookie', async () => {

@@ -2,8 +2,8 @@ const request = require('supertest');
 const app = require('../app');
 
 describe('Emergency Contacts CRUD & Isolation', () => {
-  let tokenUserA;
-  let tokenUserB;
+  let cookieUserA;
+  let cookieUserB;
 
   beforeEach(async () => {
     // Register User A
@@ -12,7 +12,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
       email: 'usera@example.com',
       password: 'password123'
     });
-    tokenUserA = resA.body.token;
+    cookieUserA = resA.headers['set-cookie'];
 
     // Register User B
     const resB = await request(app).post('/api/auth/register').send({
@@ -20,7 +20,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
       email: 'userb@example.com',
       password: 'password123'
     });
-    tokenUserB = resB.body.token;
+    cookieUserB = resB.headers['set-cookie'];
   });
 
   test('Accessing contacts requires authentication (401)', async () => {
@@ -32,7 +32,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     // Create Secondary Contact
     await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({
         name: 'Dr. Smith',
         relationship: 'Doctor',
@@ -44,7 +44,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     // Create Primary Contact
     await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({
         name: 'Jane Spouse',
         relationship: 'Spouse',
@@ -55,7 +55,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
 
     const res = await request(app)
       .get('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUserA}`);
+      .set('Cookie', cookieUserA);
 
     expect(res.status).toBe(200);
     expect(res.body.contacts.length).toBe(2);
@@ -67,7 +67,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
   test('Contact validation rejects invalid phone numbers', async () => {
     const res = await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({
         name: 'Invalid Contact',
         relationship: 'Friend',
@@ -81,7 +81,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
   test('User A can update and delete their own contact', async () => {
     const createRes = await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({
         name: 'Original Name',
         relationship: 'Friend',
@@ -93,7 +93,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     // Update
     const updateRes = await request(app)
       .put(`/api/contacts/${contactId}`)
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({
         name: 'Updated Name',
         relationship: 'Best Friend',
@@ -106,14 +106,14 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     // Delete
     const deleteRes = await request(app)
       .delete(`/api/contacts/${contactId}`)
-      .set('Authorization', `Bearer ${tokenUserA}`);
+      .set('Cookie', cookieUserA);
 
     expect(deleteRes.status).toBe(200);
 
     // Verify gone
     const listRes = await request(app)
       .get('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUserA}`);
+      .set('Cookie', cookieUserA);
 
     expect(listRes.body.contacts.length).toBe(0);
   });
@@ -122,7 +122,7 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     // User A creates contact
     const createRes = await request(app)
       .post('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({
         name: 'User A Secret Contact',
         relationship: 'Confidant',
@@ -134,14 +134,14 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     // User B lists contacts - should be empty
     const listB = await request(app)
       .get('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUserB}`);
+      .set('Cookie', cookieUserB);
 
     expect(listB.body.contacts.length).toBe(0);
 
     // User B tries to update User A contact - should return 404
     const updateB = await request(app)
       .put(`/api/contacts/${contactId}`)
-      .set('Authorization', `Bearer ${tokenUserB}`)
+      .set('Cookie', cookieUserB)
       .send({ name: 'Hacked by B' });
 
     expect(updateB.status).toBe(404);
@@ -149,14 +149,14 @@ describe('Emergency Contacts CRUD & Isolation', () => {
     // User B tries to delete User A contact - should return 404
     const deleteB = await request(app)
       .delete(`/api/contacts/${contactId}`)
-      .set('Authorization', `Bearer ${tokenUserB}`);
+      .set('Cookie', cookieUserB);
 
     expect(deleteB.status).toBe(404);
 
     // Contact still exists under User A
     const listA = await request(app)
       .get('/api/contacts')
-      .set('Authorization', `Bearer ${tokenUserA}`);
+      .set('Cookie', cookieUserA);
 
     expect(listA.body.contacts.length).toBe(1);
     expect(listA.body.contacts[0].name).toBe('User A Secret Contact');

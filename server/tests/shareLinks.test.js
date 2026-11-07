@@ -3,8 +3,8 @@ const app = require('../app');
 const ShareLink = require('../models/ShareLink');
 
 describe('Share Links Management', () => {
-  let tokenUserA;
-  let tokenUserB;
+  let cookieUserA;
+  let cookieUserB;
 
   beforeEach(async () => {
     const resA = await request(app).post('/api/auth/register').send({
@@ -12,20 +12,20 @@ describe('Share Links Management', () => {
       email: 'link_a@example.com',
       password: 'password123'
     });
-    tokenUserA = resA.body.token;
+    cookieUserA = resA.headers['set-cookie'];
 
     const resB = await request(app).post('/api/auth/register').send({
       name: 'User B',
       email: 'link_b@example.com',
       password: 'password123'
     });
-    tokenUserB = resB.body.token;
+    cookieUserB = resB.headers['set-cookie'];
   });
 
   test('Creates a share link with 24h expiry by default', async () => {
     const res = await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({ expiry: '24h' });
 
     expect(res.status).toBe(201);
@@ -45,10 +45,11 @@ describe('Share Links Management', () => {
   test('Creates a PIN-protected share link with hashed PIN', async () => {
     const res = await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({ expiry: '1h', pin: '5678' });
 
     expect(res.status).toBe(201);
+    expect(res.body.shareLink).toHaveProperty('token');
     expect(res.body.shareLink.hasPin).toBe(true);
     // PIN hash must NOT be returned in JSON response
     expect(res.body.shareLink.pinHash).toBeUndefined();
@@ -64,17 +65,17 @@ describe('Share Links Management', () => {
   test('Lists all share links for authenticated owner', async () => {
     await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({ expiry: '1h' });
 
     await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({ expiry: '7d' });
 
     const res = await request(app)
       .get('/api/share-links')
-      .set('Authorization', `Bearer ${tokenUserA}`);
+      .set('Cookie', cookieUserA);
 
     expect(res.status).toBe(200);
     expect(res.body.shareLinks.length).toBe(2);
@@ -83,14 +84,14 @@ describe('Share Links Management', () => {
   test('Revokes an active share link', async () => {
     const createRes = await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({ expiry: '24h' });
 
     const linkId = createRes.body.shareLink._id;
 
     const revokeRes = await request(app)
       .delete(`/api/share-links/${linkId}`)
-      .set('Authorization', `Bearer ${tokenUserA}`);
+      .set('Cookie', cookieUserA);
 
     expect(revokeRes.status).toBe(200);
     expect(revokeRes.body.shareLink.isRevoked).toBe(true);
@@ -102,14 +103,14 @@ describe('Share Links Management', () => {
   test('User Data Isolation: User B cannot revoke User A share link', async () => {
     const createRes = await request(app)
       .post('/api/share-links')
-      .set('Authorization', `Bearer ${tokenUserA}`)
+      .set('Cookie', cookieUserA)
       .send({ expiry: '24h' });
 
     const linkId = createRes.body.shareLink._id;
 
     const revokeRes = await request(app)
       .delete(`/api/share-links/${linkId}`)
-      .set('Authorization', `Bearer ${tokenUserB}`);
+      .set('Cookie', cookieUserB);
 
     expect(revokeRes.status).toBe(404);
   });
