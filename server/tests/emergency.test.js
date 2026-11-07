@@ -96,10 +96,21 @@ describe('Public Emergency Card Access & Security', () => {
     pinShareToken = pinLinkRes.body.shareLink.token;
   });
 
-  test('Nonexistent token returns 404', async () => {
+  test('Nonexistent token returns 404 with strict privacy headers', async () => {
     const res = await request(app).post('/api/emergency/nonexistent-token-12345');
     expect(res.status).toBe(404);
     expect(res.body.message).toMatch(/not exist/i);
+    expect(res.headers['cache-control']).toBe('no-store');
+    expect(res.headers['x-robots-tag']).toBe('noindex');
+    expect(res.headers['referrer-policy']).toBe('no-referrer');
+  });
+
+  test('GET /api/emergency/:token status check returns strict privacy headers', async () => {
+    const res = await request(app).get(`/api/emergency/${normalShareToken}`);
+    expect(res.status).toBe(200);
+    expect(res.headers['cache-control']).toBe('no-store');
+    expect(res.headers['x-robots-tag']).toBe('noindex');
+    expect(res.headers['referrer-policy']).toBe('no-referrer');
   });
 
   test('Public access returns minimal payload with only visible items sorted by priority', async () => {
@@ -114,6 +125,16 @@ describe('Public Emergency Card Access & Security', () => {
     expect(res.body).not.toHaveProperty('email');
     expect(res.body).not.toHaveProperty('userId');
     expect(res.body).not.toHaveProperty('password');
+
+    // Verify privacy and anti-indexing headers on /api/emergency
+    expect(res.headers['cache-control']).toBe('no-store');
+    expect(res.headers['x-robots-tag']).toBe('noindex');
+    expect(res.headers['referrer-policy']).toBe('no-referrer');
+
+    // Security & privacy check: internal database _id must NOT be exposed on public cards
+    expect(res.body.contacts[0]).not.toHaveProperty('_id');
+    expect(res.body.contacts[1]).not.toHaveProperty('_id');
+    expect(res.body.instructions[0]).not.toHaveProperty('_id');
 
     // Only 2 visible contacts returned (Sherlock Holmes & Mrs. Hudson)
     expect(res.body.contacts.length).toBe(2);

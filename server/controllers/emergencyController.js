@@ -35,14 +35,12 @@ const getEmergencyPayload = async (userId, expiresAt) => {
   return {
     ownerName: user.name,
     contacts: sortedContacts.map(c => ({
-      _id: c._id,
       name: c.name,
       relationship: c.relationship,
       phone: c.phone,
       priority: c.priority
     })),
     instructions: instructions.map(i => ({
-      _id: i._id,
       title: i.title,
       text: i.text
     })),

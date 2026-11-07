@@ -24,7 +24,28 @@ export default function EmergencyCardPage() {
 
   useEffect(() => {
     document.title = 'Emergency Card - EmergencyInfo Vault';
+
+    // Privacy meta guard: Prevent search engine indexing of emergency cards
+    let metaRobots = document.querySelector('meta[name="robots"]');
+    let createdMeta = false;
+    if (!metaRobots) {
+      metaRobots = document.createElement('meta');
+      metaRobots.setAttribute('name', 'robots');
+      document.head.appendChild(metaRobots);
+      createdMeta = true;
+    }
+    const previousContent = metaRobots.getAttribute('content');
+    metaRobots.setAttribute('content', 'noindex, nofollow');
+
     checkStatus();
+
+    return () => {
+      if (createdMeta && metaRobots.parentNode) {
+        metaRobots.parentNode.removeChild(metaRobots);
+      } else if (previousContent) {
+        metaRobots.setAttribute('content', previousContent);
+      }
+    };
   }, [token]);
 
   const checkStatus = async () => {
@@ -259,8 +280,8 @@ export default function EmergencyCardPage() {
                   </p>
                 </div>
               ) : (
-                cardData.contacts.map((contact) => (
-                  <article key={contact._id} className="emergency-contact-card">
+                cardData.contacts.map((contact, index) => (
+                  <article key={contact.phone || `${contact.name}-${index}`} className="emergency-contact-card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                       <span className="contact-name" style={{ fontSize: '1.5rem' }}>{contact.name}</span>
                       <span className={`badge badge-${contact.priority}`}>
@@ -308,8 +329,8 @@ export default function EmergencyCardPage() {
                   </p>
                 </div>
               ) : (
-                cardData.instructions.map((inst) => (
-                  <article key={inst._id} className="emergency-instruction-card">
+                cardData.instructions.map((inst, index) => (
+                  <article key={`${inst.title}-${index}`} className="emergency-instruction-card">
                     <h3 className="emergency-instruction-title" style={{ fontSize: '1.375rem' }}>
                       {inst.title}
                     </h3>
