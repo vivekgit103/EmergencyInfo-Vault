@@ -79,12 +79,7 @@ const loginUser = asyncHandler(async (req, res) => {
  * @access  Public
  */
 const logoutUser = asyncHandler(async (req, res) => {
-  const isProduction = process.env.NODE_ENV === 'production';
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'strict' : 'lax'
-  });
+  res.clearCookie('token', getCookieOptions(true));
 
   res.status(200).json({
     message: 'Logged out successfully'

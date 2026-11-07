@@ -3,6 +3,7 @@ const Contact = require('../models/Contact');
 const Instruction = require('../models/Instruction');
 const ShareLink = require('../models/ShareLink');
 const asyncHandler = require('../utils/asyncHandler');
+const { getCookieOptions } = require('../utils/tokenUtils');
 
 /**
  * @desc    Permanently delete user account and all associated emergency data
@@ -43,13 +44,8 @@ const deleteAccount = asyncHandler(async (req, res) => {
     User.deleteOne({ _id: userId })
   ]);
 
-  // Clear auth cookie
-  const isProduction = process.env.NODE_ENV === 'production';
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'strict' : 'lax'
-  });
+  // Clear auth cookie using shared cookie helper
+  res.clearCookie('token', getCookieOptions(true));
 
   res.status(200).json({
     message: 'Your account and all associated contacts, instructions, and share links have been permanently deleted.'
