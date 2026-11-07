@@ -12,6 +12,12 @@ const errorHandler = (err, req, res, next) => {
   let message = err.message || 'Internal Server Error';
   let errors = err.errors || undefined;
 
+  // Handle CORS Error
+  if (err.message === 'Not allowed by CORS') {
+    statusCode = 403;
+    message = 'Not allowed by CORS';
+  }
+
   // Handle Mongoose Bad ObjectId (CastError)
   if (err.name === 'CastError') {
     statusCode = 404;

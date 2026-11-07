@@ -18,17 +18,16 @@ const app = express();
 app.use(helmet());
 
 // Cross-Origin Resource Sharing
-const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, or automated test runners)
       if (!origin) return callback(null, true);
-      // Allow configured origin or localhost
-      if (origin === clientOrigin || origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      // Allow only configured CLIENT_ORIGIN
+      if (origin === process.env.CLIENT_ORIGIN) {
         return callback(null, true);
       }
-      return callback(null, true); // Permissive in dev/testing, can be restricted if needed
+      return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
